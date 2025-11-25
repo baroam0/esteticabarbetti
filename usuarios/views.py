@@ -8,7 +8,7 @@ from django.contrib import messages
 @login_required
 def listar_usuarios(request):
     usuarios = User.objects.all()
-    return render(request, 'usuarios/lista_usuarios.html', {'usuarios': usuarios})
+    return render(request, 'usuarios/lista_usuarios2.html', {'usuarios': usuarios})
 
 
 @login_required

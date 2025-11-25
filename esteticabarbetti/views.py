@@ -1,5 +1,6 @@
 
 
+from datetime import datetime
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, redirect
@@ -7,7 +8,14 @@ from django.shortcuts import render, redirect
 
 @login_required(login_url='/login')
 def home(request):
-    return render(request, 'base.html')
+    anio_actual = datetime.now().year    
+    return render(
+        request, 
+        'base.html', 
+        {
+            'anio_actual': anio_actual
+        }
+    )
 
 
 def loginusuario(request):
