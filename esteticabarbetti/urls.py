@@ -24,5 +24,6 @@ urlpatterns = [
     path('', home, name="home"),
     path('salir/', salir),
     path('login/', loginusuario, name="login"),
-    path('usuarios/', include('usuarios.urls'))
+    path('usuarios/', include('usuarios.urls')),
+    path('tratamientos/', include('tratamientos.urls'))
 ]
