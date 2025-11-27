@@ -61,12 +61,13 @@
 
             <!-- Nav Item - Pages Collapse Menu -->
 
-
+            {% if user.is_staff %}
             <li class="nav-item">
                 <a class="nav-link" href="/usuarios/lista">
                     <i class="fas fa-fw fa-user-alt"></i>
                     <span>Usuarios</span></a>
             </li>
+            {%endif%}
 
             <li class="nav-item">
                 <a class="nav-link" href="/tratamientos/lista">
