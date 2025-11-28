@@ -31,16 +31,22 @@
                                 </div>
                                 <div class="form-group row">
                                     <div class="col-sm-6 mb-3 mb-sm-0">
-                                        <!--input type="password" class="form-control form-control-user"
-                                            id="exampleInputPassword" placeholder="Password"-->
                                             {{form.username}}
                                     </div>
                                     <div class="col-sm-6">
-                                        <!--input type="password" class="form-control form-control-user"
-                                            id="exampleRepeatPassword" placeholder="Repeat Password"-->
                                             {{form.password}}
                                     </div>
                                 </div>
+
+                                <div class="form-group">
+                                    <div class="custom-control custom-checkbox small">
+                                        <!--input type="checkbox" class="custom-control-input" id="customCheck"-->
+                                        {{form.is_active}}
+                                        <label class="custom-control-label" for="id_is_active">Usuario activo
+                                        </label>
+                                    </div>
+                                </div>
+
                                 <button type="submit" class="btn btn-primary btn-user btn-block">
                                     Registrar Usuario
                                 </button>

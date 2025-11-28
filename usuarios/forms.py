@@ -28,14 +28,24 @@ class UsuarioForm(forms.ModelForm):
         widget=forms.PasswordInput(attrs={'placeholder': 'Password'})
     )
 
+    is_active = forms.BooleanField(
+        required=False,
+        initial=True,  # por defecto activo
+    )
+
     def __init__(self, *args, **kwargs):
         super(UsuarioForm, self).__init__(*args, **kwargs)
         for field in iter(self.fields):
-            self.fields[field].widget.attrs.update({
-                'class': 'form-control form-control-user'
-            })
+            if field == "is_active":
+                self.fields[field].widget.attrs.update({
+                    'class': 'custom-control-input'
+                })
+            else:
+                self.fields[field].widget.attrs.update({
+                    'class': 'form-control form-control-user'
+                })
 
     class Meta:
         model = User
-        fields = ["username", "first_name", "last_name", "password"]
+        fields = ["username", "first_name", "last_name", "password", "is_active"]
 

@@ -43,7 +43,6 @@ def crear_tratamiento(request):
 
 @login_required
 def editar_tratamiento(request, pk):
-    #tratamiento = get_object_or_404(Tratamiento, pk=pk, usuario=request.user)  
     tratamiento = get_object_or_404(Tratamiento, pk=pk)
     if request.method == 'POST':
         form = TratamientoForm(request.POST, instance=tratamiento)
