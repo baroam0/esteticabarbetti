@@ -25,8 +25,8 @@ def cargar_pacientes(archivo_txt):
 
             fecha = datos[2].split(" ")
             
-            print(len(datos))
-            print(datos)
+            #print(len(datos))
+            #print(datos)
             Paciente.objects.create(
                     idaccess=datos[0],
                     nombre=datos[1],
@@ -43,7 +43,7 @@ def cargar_pacientes(archivo_txt):
                 aviso=datos[12],
             )
 
-            print(f"Paciente {datos[0]} insertado correctamente.")
+            #print(f"Paciente {datos[0]} insertado correctamente.")
         
 if __name__ == "__main__":
     cargar_pacientes("pacientes.txt")
