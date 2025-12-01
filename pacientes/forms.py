@@ -4,6 +4,16 @@ from django import forms
 from .models import Paciente
 
 class PacienteForm(forms.ModelForm):
+
+    def __init__(self, *args, **kwargs):
+            super(PacienteForm, self).__init__(*args, **kwargs)
+            """
+            for field in iter(self.fields):
+                    self.fields[field].widget.attrs.update({
+                        'class': 'form-control form-control-user'
+                    })
+            """
+
     class Meta:
         model = Paciente
         fields = [
@@ -22,18 +32,23 @@ class PacienteForm(forms.ModelForm):
             'foto',
             'aviso',
         ]
+
+        labels = {
+            'foto': 'Elegir imagen',
+        }
+
         widgets = {
             'fechanacimiento': forms.DateInput(attrs={'type': 'date', 'class': 'form-control'}),
             'sexo': forms.Select(attrs={'class': 'form-select'}),
-            'nombre': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Nombre completo'}),
-            'estadocivil': forms.TextInput(attrs={'class': 'form-control'}),
-            'numerodocumento': forms.TextInput(attrs={'class': 'form-control'}),
-            'domicilio': forms.TextInput(attrs={'class': 'form-control'}),
-            'correoelectronico': forms.EmailInput(attrs={'class': 'form-control'}),
-            'obrasocial': forms.TextInput(attrs={'class': 'form-control'}),
-            'telefono': forms.TextInput(attrs={'class': 'form-control'}),
-            'notas': forms.Textarea(attrs={'class': 'form-control', 'rows': 3}),
-            'proximoturno': forms.TextInput(attrs={'class': 'form-control'}),
-            'foto': forms.ClearableFileInput(attrs={'class': 'form-control'}),
-            'aviso': forms.Textarea(attrs={'class': 'form-control', 'rows': 2}),
+            'nombre': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Apellido y Nombre'}),
+            'estadocivil': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Estado Civil'}),
+            'numerodocumento': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Numero Documento'}),
+            'domicilio': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Domicilio'}),
+            'correoelectronico': forms.EmailInput(attrs={'class': 'form-control', 'placeholder': 'Correo electronico' }),
+            'obrasocial': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Obra Social'}),
+            'telefono': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Telefono'}),
+            'notas': forms.Textarea(attrs={'class': 'form-control', 'rows': 2, 'placeholder': 'Notas...'}),
+            'proximoturno': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Proximo turno'}),
+            'foto': forms.ClearableFileInput(),
+            'aviso': forms.Textarea(attrs={'class': 'form-control', 'rows': 1, 'placeholder': 'Aviso'}),
         }
