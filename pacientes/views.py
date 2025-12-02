@@ -62,7 +62,7 @@ def editar_paciente(request, pk):
     paciente = get_object_or_404(Paciente, pk=pk)
 
     if request.method == 'POST':
-        form = PacienteForm(request.POST, request.FILES, instance=paciente)
+        form = PacienteForm(request.POST, request.FILES, instance=paciente)    
 
         if form.is_valid():
             

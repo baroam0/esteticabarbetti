@@ -11,7 +11,7 @@
                             <div class="text-center">
                                 <h1 class="h4 text-gray-900 mb-4">{{accion}} Paciente</h1>
                             </div>
-                            <form method="POST" enctype="multipart/form-data"> {% csrf_token %}
+                            <form  method="POST"> {% csrf_token %}
                                 <div class="form-group row">
                                     <div class="col-sm-12 mb-6 mb-sm-0">
                                         {{form.nombre}}
@@ -19,7 +19,7 @@
                                 </div>
                                 <div class="form-group row">
                                     <div class="col-sm-12 mb-6 mb-sm-0">
-                                        {{form.numerodocumento}}
+                                        {{form.numerodocumento}}    
                                     </div>
                                 </div>
 
@@ -76,7 +76,7 @@
                                         <div class="p-3 border rounded">
                                             {{ form.foto }} 
                                             <small class="form-text text-muted">
-                                                Para borrar la imagen seleccionada ya guardada haga click en eliminar.
+                                                Para **borrar la imagen existente**, marca la casilla. Para **limpiar la selección actual** (antes de guardar), presiona la 'X' en el campo de archivo o usa JavaScript (ver abajo).
                                             </small>
                                         </div>
 
@@ -98,22 +98,14 @@
                                     </div>
                                 </div>
 
-                                <div class="form-group row">
-                                    <div class="col-sm-6 mb-3 mb-sm-0">
-                                        <button type="submit" class="btn btn-primary btn-user btn-block">
-                                            Guardar Paciente
-                                        </button>
-                                    </div>
 
-                                    <div class="col-sm-6 mb-3 mb-sm-0">
-                                        <button type="button" class="btn btn-info btn-user btn-block" onclick="Volver()">
-                                            Cancelar
-                                        </button>
-                                    </div>
-                                </div>
+                                <button type="submit" class="btn btn-primary btn-user btn-block">
+                                    Guardar Paciente
+                                </button>
 
-
-                                
+                                <button type="button" class="btn btn-info btn-user btn-block" onclick="Volver()">
+                                    Cancelar
+                                </button>
                             </form>
                             
                         </div>
@@ -131,7 +123,7 @@
         window.location.replace("/pacientes/lista");
     }
 
-    /*
+
     document.addEventListener('DOMContentLoaded', function() {
         const inputFoto = document.querySelector('#id_foto');
         const botonLimpiar = document.getElementById('limpiarFoto');
@@ -143,7 +135,6 @@
             });
         }
     });
-    */
 
 
 </script>

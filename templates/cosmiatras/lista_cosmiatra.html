@@ -10,7 +10,7 @@
         <div class="row">
             <div class="col-sm-4"></div>
             <div class="col-sm-4">
-                <h3> Listado de Pacientes</h3>
+                <h3> Listado de Cosmiatras </h3>
             </div>
             <div class="col-sm-4"></div>
         </div>
@@ -26,7 +26,7 @@
         {% endif %}
 
 
-        <form action="/pacientes/lista" method="GET">
+        <form action="/cosmiatras/lista" method="GET">
             <div class="form-inline">
                 <div class="col-2">
                 </div>
@@ -37,7 +37,7 @@
                         <i class="fas fa-search"></i>
                     </button>
 
-                    <button type="button" class="btn btn-primary btn-circle" title="Nuevo Banco!" onclick="location.href='/pacientes/crear/'">
+                    <button type="button" class="btn btn-primary btn-circle" title="Nueva Cosdmiatra!" onclick="location.href='/cosmiatras/crear/'">
                         <i class="fas fa-plus"></i>
                     </button>
                 </div>
@@ -52,7 +52,6 @@
                 <thead>
                     <tr>
                         <th>Apellido y Nombre</th>
-                        <th>Edad</th>
                         <th>Domicilio</th>
                         <th>Editar</th>
                         <th>Historia Clinica</th>
@@ -71,13 +70,13 @@
                         <td>{{ paciente.domicilio }}  </td>
                         
                         <td>
-                            <button type="button" class="btn btn-link btn-sm" onclick="location.href='/pacientes/editar/' + {{ paciente.pk }}">
+                            <button type="button" class="btn btn-link btn-sm" onclick="location.href='/cosmiatras/editar/' + {{ paciente.pk }}">
                                 <i class="fas fa-pencil-alt"></i>
                             </button>
                         </td>
                         <td>
-                            <button type="button" class="btn btn-link btn-sm" onclick="location.href='/historiasclinicas/lista/' + {{ paciente.pk }}">
-                                <i class="fas fa-comment-medical"></i>
+                            <button type="button" class="btn btn-link btn-sm" onclick="location.href='/cosmiatras/editar/' + {{ paciente.pk }}">
+                                <i class="fas fa-pencil-alt"></i>
                             </button>
                         </td>
                     </tr>
@@ -146,8 +145,8 @@
                                 </button>
                             </td>
                             <td>
-                                <button type="button" class="btn btn-link btn-sm" onclick="location.href='/historiasclinicas/lista/${p.id}'">
-                                    <i class="fas fa-comment-medical"></i>
+                                <button type="button" class="btn btn-link btn-sm" onclick="location.href='/pacientes/editar/${p.id}'">
+                                    <i class="fas fa-pencil-alt"></i>
                                 </button>
                             </td>
                         </tr>
