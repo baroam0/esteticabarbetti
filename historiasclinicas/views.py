@@ -47,8 +47,8 @@ def crear_historiaclinica(request, pk):
         form_historiaclinica = HistoriaClinicaForm(request.POST)
         form_imagenes = ImagenHistoriaClinicaForm(request.POST, request.FILES)
 
-        if form_historia.is_valid():
-            historiaclinica = form_historia.save(commit=False)
+        if form_historiaclinica.is_valid():
+            historiaclinica = form_historiaclinica.save(commit=False)
             historiaclinica.paciente = paciente
             historiaclinica.responsable = request.user 
             historiaclinica.save()
@@ -65,9 +65,31 @@ def crear_historiaclinica(request, pk):
         form_imagenes = ImagenHistoriaClinicaForm()
 
     return render(request, 'historiasclinicas/crear_historiaclinica.html', {
-        'form_historiaclinica': form_historiaclinica,
+        'accion': "Crear",
+        'form': form_historiaclinica,
+        'form_imagenes': form_imagenes,
+        'paciente': paciente
+    })
+
+"""
+def agregar_imagenes_historia(request, pk):
+    historia = get_object_or_404(HistoriaClinica, pk=pk)
+
+    if request.method == 'POST':
+        form_imagenes = ImagenHistoriaClinicaForm(request.POST, request.FILES)
+        if form_imagenes.is_valid():
+            imagenes = request.FILES.getlist('imagen')
+            for img in imagenes:
+                ImagenHistoriaClinica.objects.create(historia=historia, imagen=img)
+            return redirect('detalle_historia', pk=historia.pk)
+    else:
+        form_imagenes = ImagenHistoriaClinicaForm()
+
+    return render(request, 'historias/agregar_imagenes.html', {
+        'historia': historia,
         'form_imagenes': form_imagenes
     })
+"""
 
 
 def detalle_historia(request, pk):
@@ -81,28 +103,27 @@ def detalle_historia(request, pk):
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 @login_required
+def editar_historiaclinica(request, pk):
+    historia = get_object_or_404(HistoriaClinica, pk=pk)
+
+    if request.method == 'POST':
+        form_historia = HistoriaClinicaForm(request.POST, instance=historia)
+        if form_historia.is_valid():
+            form_historia.save()
+            return redirect('detalle_historia', pk=historia.pk)
+    else:
+        form_historia = HistoriaClinicaForm(instance=historia)
+
+    return render(request, 'historias/editar_historia.html', {
+        'form_historia': form_historia,
+        'historia': historia
+    })
+
+
+
+"""
+
 def editar_historiaclinica(request, pk):
     historiaclinica = get_object_or_404(HistoriaClinica, pk=pk)
     
@@ -129,30 +150,7 @@ def editar_historiaclinica(request, pk):
             "historiaclinica": historiaclinica
         }
     )
-
-
-def crear_historia_clinica(request):
-    if request.method == 'POST':
-        form_historia = HistoriaClinicaForm(request.POST)
-        form_imagenes = ImagenHistoriaClinicaForm(request.POST, request.FILES)
-
-        if form_historia.is_valid():
-            historia = form_historia.save()
-
-            # Guardar múltiples imágenes
-            imagenes = request.FILES.getlist('imagen')
-            for img in imagenes:
-                ImagenHistoriaClinica.objects.create(historia=historia, imagen=img)
-
-            return redirect('detalle_historia', pk=historia.pk)
-    else:
-        form_historia = HistoriaClinicaForm()
-        form_imagenes = ImagenHistoriaClinicaForm()
-
-    return render(request, 'historias/crear_historia.html', {
-        'form_historia': form_historia,
-        'form_imagenes': form_imagenes
-    })
+"""
 
 
 def detalle_historia(request, pk):
@@ -162,8 +160,6 @@ def detalle_historia(request, pk):
         'historia': historia,
         'imagenes': imagenes
     })
-
-
 
 
 # Create your views here.

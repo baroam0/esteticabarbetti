@@ -1,6 +1,8 @@
 
+
 from django.contrib.auth.models import User
 from django.db import models
+from django.utils import timezone
 
 from pacientes.models import Paciente
 
@@ -17,6 +19,12 @@ class HistoriaClinica(models.Model):
 
     def __str__(self):
         return self.diagnostico
+
+    def save(self, *args, **kwargs):
+        # Si la fecha está vacía o nula, asignamos la fecha y hora actual
+        if not self.fecha:
+            self.fecha = timezone.now()
+        super().save(*args, **kwargs)
     
     class Meta:
         verbose_name_plural = "Historias Clinicas"
@@ -28,7 +36,6 @@ class ImagenHistoriaClinica(models.Model):
         related_name='imagenes'
     )
     imagen = models.ImageField(upload_to='historias_clinicas/')
-    descripcion = models.CharField(max_length=255, null=True, blank=True)
 
     def __str__(self):
         return f"Imagen de {self.historia.diagnostico}"

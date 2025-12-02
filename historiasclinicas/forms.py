@@ -38,4 +38,4 @@ class ImagenHistoriaClinicaForm(forms.ModelForm):
 
     class Meta:
         model = ImagenHistoriaClinica
-        fields = ['imagen', 'descripcion']
+        fields = ['imagen']
