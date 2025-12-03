@@ -1,74 +1,94 @@
 {% extends 'base.html' %}
 
 {% block content %}
+<div class="container-fluid">
 
-        <div class="card o-hidden border-0 shadow-lg my-5">
-            <div class="card-body p-0">
-                <!-- Nested Row within Card Body -->
-                <div class="row">
-                    
-                    <div class="col-lg-12">
-                        <div class="p-5">
-                            <div class="text-center">
-                                <h1 class="h4 text-gray-900 mb-4">{{accion}} Historia Clinica - {{paciente.nombre}}</h1>
+    <!-- Encabezado -->
+    <h1 class="h3 mb-4 text-gray-800">
+        <i class="fas fa-notes-medical"></i> {{accion}} Historia Clínica - {{paciente.nombre}}
+    </h1>
+
+    <div class="card shadow mb-4">
+        <div class="card-body">
+            <form method="POST" enctype="multipart/form-data">
+                {% csrf_token %}
+
+                <!-- Campos principales -->
+                <div class="form-group">
+                    <label for="id_historia">Historia</label>
+                    {{ form.historia }}
+                </div>
+
+                <div class="form-group">
+                    <label for="id_diagnostico">Diagnóstico</label>
+                    {{ form.diagnostico }}
+                </div>
+
+                <div class="form-group">
+                    <label for="id_tratamiento">Tratamiento</label>
+                    {{ form.tratamiento }}
+                </div>
+
+                <!-- Imágenes existentes (solo en edición) -->
+                {% if accion == "Editar" and imagenes_existentes %}
+                    <h5 class="mt-4"><i class="fas fa-images"></i> Imágenes existentes</h5>
+                    <div class="d-flex flex-wrap">
+                        {% for img in imagenes_existentes %}
+                            <div class="card m-2" style="width: 160px;">
+                                <div class="card-body text-center p-2">
+                                    <img src="{{ img.imagen.url }}" 
+                                         class="img-fluid img-thumbnail"
+                                         style="max-height:150px; cursor:pointer;"
+                                         onclick="abrirModal('{{ img.imagen.url }}')">
+                                </div>
                             </div>
-                            <form method="POST" enctype="multipart/form-data"> {% csrf_token %}
+                        {% endfor %}
+                    </div>
+                {% endif %}
 
-                                <div class="form-group row">
-                                    <label for="id_historia" class="col-auto col-form-label">Historia</label>
-                                    <div class="col">
-                                        {{ form.historia }}
-                                    </div>
-                                </div>
+                <!-- Subir nuevas imágenes -->
+                <h5 class="mt-4"><i class="fas fa-upload"></i> Subir nuevas imágenes</h5>
+                {{ imagenes_form.imagenes }}
 
-                                <div class="form-group row">
-                                    <label for="id_diagnostico" class="col-auto col-form-label">Diagnostico</label>
-                                    <div class="col">
-                                        {{ form.diagnostico }}
-                                    </div>
-                                </div>
-
-                                <div class="form-group row">
-                                    <label for="id_tratamiento" class="col-auto col-form-label">Tratamiento</label>
-                                    <div class="col">
-                                        {{ form.tratamiento }}
-                                    </div>
-                                </div>
-
-                                {{ form_imagenes.as_p }}
-
-
-                                <div class="form-group row">
-                                    <div class="col-sm-6 mb-3 mb-sm-0">
-                                        <button type="submit" class="btn btn-primary btn-user btn-block">
-                                            Guardar
-                                        </button>
-                                    </div>
-
-                                    <div class="col-sm-6 mb-3 mb-sm-0">
-                                        <button type="button" class="btn btn-info btn-user btn-block" onclick="Volver()">
-                                            Cancelar
-                                        </button>
-                                    </div>
-                                </div>
-                                
-                            </form>
-                        </div>
+                <!-- Botones -->
+                <div class="row mt-4">
+                    <div class="col-sm-6 mb-2">
+                        <button type="submit" class="btn btn-success btn-block">
+                            <i class="fas fa-save"></i> {{accion}}
+                        </button>
+                    </div>
+                    <div class="col-sm-6 mb-2">
+                        <button type="button" class="btn btn-secondary btn-block" onclick="Volver()">
+                            <i class="fas fa-times"></i> Cancelar
+                        </button>
                     </div>
                 </div>
-            </div>
+            </form>
         </div>
+    </div>
 
+</div>
 
-{%endblock%}
+<!-- Modal Bootstrap -->
+<div class="modal fade" id="modalImagen" tabindex="-1" role="dialog">
+  <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+    <div class="modal-content bg-dark">
+      <div class="modal-body text-center">
+        <img id="imagenModal" class="img-fluid rounded" alt="Imagen">
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
 
-
-{% block js%}
+{% block js %}
 <script>
-    function Volver() {
-        window.location.replace("/historiasclinicas/lista/" + "{{ historiaclinica.paciente.pk }}");
-    }
+function Volver() {
+    window.location.replace("/historiasclinicas/lista/" + "{{ paciente.pk }}");
+}
+function abrirModal(url) {
+    document.getElementById("imagenModal").src = url;
+    $('#modalImagen').modal('show');
+}
 </script>
-{%endblock%}
-
-
+{% endblock %}

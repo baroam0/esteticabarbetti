@@ -4,14 +4,14 @@ from django.contrib.auth.decorators import login_required
 from django.shortcuts import get_object_or_404, render, redirect
 
 from pacientes.models import Paciente
-from .forms import HistoriaClinicaForm, ImagenHistoriaClinicaForm
+from .forms import HistoriaClinicaForm, ImagenMultipleForm
 from .models import HistoriaClinica, ImagenHistoriaClinica
 
 
 @login_required
 def listar_historiasclinicas(request, pk):
     paciente = Paciente.objects.get(pk=pk)
-    historiasclinicas = HistoriaClinica.objects.filter(paciente=paciente).order_by('fecha')
+    historiasclinicas = HistoriaClinica.objects.filter(paciente=paciente).order_by('-fecha')
     return render(
         request, 
         'historiasclinicas/lista_historiaclinica.html', 
@@ -21,145 +21,90 @@ def listar_historiasclinicas(request, pk):
         }
     )
 
-"""
-@login_required
+
+
 def crear_historiaclinica(request, pk):
-    paciente = Paciente.objects.get(pk=pk)
-    if request.method == 'POST':
+    paciente = get_object_or_404(Paciente, pk=pk)
+
+    if request.method == "POST":
         form = HistoriaClinicaForm(request.POST)
-        if form.is_valid():
-            historiaclinica = form.save(commit=False)
-            historiaclinica.paciente = paciente
-            historiaclinica.responsable = request.user 
-            historiaclinica.save()
-            form.save()
-            return redirect('listar_historiasclinicas', pk=pk)
+        imagenes_form = ImagenMultipleForm(request.POST, request.FILES)
+
+        if form.is_valid() and imagenes_form.is_valid():
+            historia = form.save(commit=False)
+            historia.paciente = paciente
+            historia.responsable = request.user
+            historia.save()
+
+            # Guardar todas las imágenes seleccionadas
+            for img in request.FILES.getlist('imagenes'):
+                ImagenHistoriaClinica.objects.create(
+                    historiaclinica=historia,
+                    imagen=img
+                )
+
+            return redirect('editar_historiaclinica', pk=historia.pk)
+
     else:
         form = HistoriaClinicaForm()
-    
-    return render(request, 'historiasclinicas/crear_historiaclinica.html', {'form': form})
-"""
+        imagenes_form = ImagenMultipleForm()
 
-@login_required
-def crear_historiaclinica(request, pk):
-    paciente = Paciente.objects.get(pk=pk)
-    if request.method == 'POST':
-        form_historiaclinica = HistoriaClinicaForm(request.POST)
-        form_imagenes = ImagenHistoriaClinicaForm(request.POST, request.FILES)
-
-        if form_historiaclinica.is_valid():
-            historiaclinica = form_historiaclinica.save(commit=False)
-            historiaclinica.paciente = paciente
-            historiaclinica.responsable = request.user 
-            historiaclinica.save()
-
-            # Guardar múltiples imágenes
-            imagenes = request.FILES.getlist('imagen')
-            for img in imagenes:
-                ImagenHistoriaClinica.objects.create(historiaclinica=historiaclinica, imagen=img)
-
-            #return redirect('detalle_historia', pk=historia.pk)
-            return redirect('listar_historiasclinicas', pk=pk)
-    else:
-        form_historiaclinica = HistoriaClinicaForm()
-        form_imagenes = ImagenHistoriaClinicaForm()
-
-    return render(request, 'historiasclinicas/crear_historiaclinica.html', {
-        'accion': "Crear",
-        'form': form_historiaclinica,
-        'form_imagenes': form_imagenes,
-        'paciente': paciente
-    })
-
-"""
-def agregar_imagenes_historia(request, pk):
-    historia = get_object_or_404(HistoriaClinica, pk=pk)
-
-    if request.method == 'POST':
-        form_imagenes = ImagenHistoriaClinicaForm(request.POST, request.FILES)
-        if form_imagenes.is_valid():
-            imagenes = request.FILES.getlist('imagen')
-            for img in imagenes:
-                ImagenHistoriaClinica.objects.create(historia=historia, imagen=img)
-            return redirect('detalle_historia', pk=historia.pk)
-    else:
-        form_imagenes = ImagenHistoriaClinicaForm()
-
-    return render(request, 'historias/agregar_imagenes.html', {
-        'historia': historia,
-        'form_imagenes': form_imagenes
-    })
-"""
-
-
-def detalle_historia(request, pk):
-    historia = get_object_or_404(HistoriaClinica, pk=pk)
-    imagenes = historia.imagenes.all()
-    return render(request, 'historias/detalle_historia.html', {
-        'historia': historia,
-        'imagenes': imagenes
-    })
-
-
-
-
-@login_required
-def editar_historiaclinica(request, pk):
-    historia = get_object_or_404(HistoriaClinica, pk=pk)
-
-    if request.method == 'POST':
-        form_historia = HistoriaClinicaForm(request.POST, instance=historia)
-        if form_historia.is_valid():
-            form_historia.save()
-            return redirect('detalle_historia', pk=historia.pk)
-    else:
-        form_historia = HistoriaClinicaForm(instance=historia)
-
-    return render(request, 'historias/editar_historia.html', {
-        'form_historia': form_historia,
-        'historia': historia
-    })
-
-
-
-"""
-
-def editar_historiaclinica(request, pk):
-    historiaclinica = get_object_or_404(HistoriaClinica, pk=pk)
-    
-    if request.method == "POST":
-        print("por el post")
-        form = HistoriaClinicaForm(request.POST, instance=historiaclinica)
-        if form.is_valid():
-            fomulariohistoriaclinica = form.save(commit=False)
-            fomulariohistoriaclinica.responsable = request.user
-            fomulariohistoriaclinica.save()
-            #form.save()
-            print(historiaclinica.paciente.pk)
-            return redirect('listar_historiasclinicas', pk=historiaclinica.paciente.pk)
-            
-    else:
-        form = HistoriaClinicaForm(instance=historiaclinica)
-    
     return render(
-        request, 
-        "historiasclinicas/crear_historiaclinica.html", 
+        request,
+        "historiasclinicas/crear_historiaclinica.html",
         {
-            "accion": "Editar", 
-            "form": form, 
-            "historiaclinica": historiaclinica
+            "accion": "Crear",
+            "form": form,
+            "imagenes_form": imagenes_form,
+            "paciente": paciente
         }
     )
-"""
 
 
-def detalle_historia(request, pk):
+
+@login_required
+def editar_historiaclinica(request, pk):
     historia = get_object_or_404(HistoriaClinica, pk=pk)
-    imagenes = historia.imagenes.all()
-    return render(request, 'historias/detalle_historia.html', {
-        'historia': historia,
-        'imagenes': imagenes
-    })
+    paciente = historia.paciente
 
+    if request.method == "POST":
+        form = HistoriaClinicaForm(request.POST, instance=historia)
+        imagenes_form = ImagenMultipleForm(request.POST, request.FILES)
+
+        if form.is_valid() and imagenes_form.is_valid():
+            historia = form.save(commit=False)
+            historia.responsable = request.user
+            historia.save()
+
+            # Opcional: borrar imágenes anteriores si quieres reemplazar
+            # historia.imagenes.all().delete()
+
+            # Guardar nuevas imágenes seleccionadas
+            for img in request.FILES.getlist('imagenes'):
+                ImagenHistoriaClinica.objects.create(
+                    historiaclinica=historia,
+                    imagen=img
+                )
+
+            return redirect('editar_historiaclinica', pk=historia.pk)
+
+    else:
+        form = HistoriaClinicaForm(instance=historia)
+        imagenes_form = ImagenMultipleForm()
+
+    imagenes_existentes = historia.imagenes.all()
+
+    return render(
+        request,
+        "historiasclinicas/crear_historiaclinica.html",
+        {
+            "accion": "Editar",
+            "form": form,
+            "imagenes_form": imagenes_form,
+            "paciente": paciente,
+            "historia": historia,
+            "imagenes_existentes": imagenes_existentes
+        }
+    )
 
 # Create your views here.

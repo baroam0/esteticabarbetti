@@ -36,7 +36,7 @@ class PacienteForm(forms.ModelForm):
             'telefono',
             'notas',
             'proximoturno',
-            'foto',
+            #'foto',
             'aviso',
         ]
 
@@ -45,7 +45,7 @@ class PacienteForm(forms.ModelForm):
         }
 
         widgets = {
-            'fechanacimiento': forms.DateInput(format='%Y-%m-%d', attrs={'type': 'date', 'class': 'form-control'}),
+            'fechanacimiento': forms.DateInput(format='%Y-%m-%d', attrs={'type': 'date', 'class': 'form-control', 'required' : 'False'}),
             'sexo': forms.Select(attrs={'class': 'form-select'}),
             'nombre': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Apellido y Nombre'}),
             'estadocivil': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Estado Civil'}),
@@ -56,6 +56,6 @@ class PacienteForm(forms.ModelForm):
             'telefono': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Telefono'}),
             'notas': forms.Textarea(attrs={'class': 'form-control', 'rows': 2, 'placeholder': 'Notas...'}),
             'proximoturno': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Proximo turno'}),
-            'foto': forms.ClearableFileInput(),
+            #'foto': forms.ClearableFileInput(),
             'aviso': forms.Textarea(attrs={'class': 'form-control', 'rows': 1, 'placeholder': 'Aviso'}),
         }

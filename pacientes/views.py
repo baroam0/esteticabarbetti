@@ -46,10 +46,12 @@ def buscar_pacientes(request):
 def crear_paciente(request):
     if request.method == 'POST':
         form = PacienteForm(request.POST, request.FILES)
-        
         if form.is_valid():
-            form.save()
-            return redirect('listar_pacientes') 
+            paciente=form.save()
+            nuevo_id=paciente.id
+            return redirect('listar_historiasclinicas', pk=nuevo_id)
+
+        
 
     else:
         form = PacienteForm()
