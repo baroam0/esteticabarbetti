@@ -1,7 +1,7 @@
 
-
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import get_object_or_404, render, redirect
+from django.http import JsonResponse
 
 from pacientes.models import Paciente
 from .forms import HistoriaClinicaForm, ImagenMultipleForm
@@ -22,7 +22,7 @@ def listar_historiasclinicas(request, pk):
     )
 
 
-
+@login_required
 def crear_historiaclinica(request, pk):
     paciente = get_object_or_404(Paciente, pk=pk)
 
@@ -35,9 +35,8 @@ def crear_historiaclinica(request, pk):
             historia.paciente = paciente
             historia.responsable = request.user
             historia.save()
-
-            # Guardar todas las imágenes seleccionadas
-            for img in request.FILES.getlist('imagenes'):
+           
+            for img in request.FILES.getlist('imagenes[]'):
                 ImagenHistoriaClinica.objects.create(
                     historiaclinica=historia,
                     imagen=img
@@ -61,7 +60,6 @@ def crear_historiaclinica(request, pk):
     )
 
 
-
 @login_required
 def editar_historiaclinica(request, pk):
     historia = get_object_or_404(HistoriaClinica, pk=pk)
@@ -76,11 +74,10 @@ def editar_historiaclinica(request, pk):
             historia.responsable = request.user
             historia.save()
 
-            # Opcional: borrar imágenes anteriores si quieres reemplazar
-            # historia.imagenes.all().delete()
+            # Obtener archivos enviados
+            imagenes = request.FILES.getlist('imagenes[]')
 
-            # Guardar nuevas imágenes seleccionadas
-            for img in request.FILES.getlist('imagenes'):
+            for img in imagenes:
                 ImagenHistoriaClinica.objects.create(
                     historiaclinica=historia,
                     imagen=img
@@ -106,5 +103,12 @@ def editar_historiaclinica(request, pk):
             "imagenes_existentes": imagenes_existentes
         }
     )
+
+def eliminar_imagen(request, pk):
+    if request.method == "POST":
+        print(request.POST)
+        ImagenHistoriaClinica.objects.filter(pk=pk).delete()
+        return JsonResponse({"ok": True})
+
 
 # Create your views here.

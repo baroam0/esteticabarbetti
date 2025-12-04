@@ -38,7 +38,7 @@ class ImagenHistoriaClinica(models.Model):
     imagen = models.ImageField(upload_to='historias_clinicas/')
 
     def __str__(self):
-        return f"Imagen de {self.historia.diagnostico}"
+        return f"Imagen de {self.historiaclinica.diagnostico}"
 
 
 # Create your models here.

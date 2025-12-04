@@ -17,8 +17,21 @@ class HistoriaClinicaForm(forms.ModelForm):
         }
 
 
+class MultipleFileInput(forms.ClearableFileInput):
+    allow_multiple_selected = True
+
+    def __init__(self, attrs=None):
+        default_attrs = {"multiple": True}
+        if attrs:
+            default_attrs.update(attrs)
+        super().__init__(default_attrs)
+
+
 class ImagenMultipleForm(forms.Form):
-    imagenes = forms.ImageField(
-        widget=forms.ClearableFileInput(attrs={'multiple': True, 'class': 'form-control'}),
+    imagenes = forms.FileField(
+        widget=MultipleFileInput(attrs={
+            "name": "imagenes[]",
+        }),
         required=False
     )
+

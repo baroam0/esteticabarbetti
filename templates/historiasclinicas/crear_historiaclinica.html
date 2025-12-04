@@ -40,15 +40,26 @@
                                          class="img-fluid img-thumbnail"
                                          style="max-height:150px; cursor:pointer;"
                                          onclick="abrirModal('{{ img.imagen.url }}')">
+                                        
+                                    <!--div class="mt-2">
+                                        <input type="checkbox" 
+                                        name="eliminar_imagenes" 
+                                        value="{{ img.id }}">
+                                        <label>Eliminar</label>
+                                    </div-->
+
+                                    <button type="button" class="btn btn-danger btn-sm" onclick="eliminarImagen({{ img.pk }})">
+                                        <i class="fas fa-trash"></i>{{ img.pk }}
+                                    </button>
                                 </div>
                             </div>
                         {% endfor %}
                     </div>
                 {% endif %}
 
-                <!-- Subir nuevas imágenes -->
                 <h5 class="mt-4"><i class="fas fa-upload"></i> Subir nuevas imágenes</h5>
-                {{ imagenes_form.imagenes }}
+
+                <input id="id_imagenes" type="file" name="imagenes[]" multiple>
 
                 <!-- Botones -->
                 <div class="row mt-4">
@@ -90,5 +101,31 @@ function abrirModal(url) {
     document.getElementById("imagenModal").src = url;
     $('#modalImagen').modal('show');
 }
+
+function eliminarImagen(id) {
+    if (!confirm("¿Eliminar esta imagen?")) return;
+
+    fetch(`/historiasclinicas/api/imagen/eliminar/${id}`, {
+        method: "POST",
+        headers: {
+            "X-CSRFToken": "{{ csrf_token }}",
+        }
+    }).then(res => res.json())
+      .then(data => {
+          if (data.ok) {
+              console.log(data.ok)
+              //location.reload();
+          }
+      });
+}
+
+
+
+document.querySelector("form").addEventListener("submit", function(e) {
+    let input = document.getElementById("id_imagenes");
+    console.log("FILES ANTES DE ENVIAR:", input.files);
+});
+
+
 </script>
 {% endblock %}

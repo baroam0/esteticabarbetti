@@ -32,4 +32,7 @@ urlpatterns = [
     path('usuarios/', include('usuarios.urls')),
     path('pacientes/', include('pacientes.urls')),
     path('tratamientos/', include('tratamientos.urls'))
-] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+]
+
+if settings.DEBUG:
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

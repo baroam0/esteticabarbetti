@@ -5,12 +5,13 @@ from .models import Paciente
 
 class PacienteForm(forms.ModelForm):
     fechanacimiento = forms.DateField(
-        widget=forms.DateInput(
-            format='%Y-%m-%d',
-            attrs={'type': 'date', 'class': 'form-control'}
-        ),
-        input_formats=['%Y-%m-%d']
-    )
+            required=False,
+            widget=forms.DateInput(
+                format='%Y-%m-%d',
+                attrs={'type': 'date', 'class': 'form-control'}
+            ),
+            input_formats=['%Y-%m-%d']
+        )
 
     def __init__(self, *args, **kwargs):
             super(PacienteForm, self).__init__(*args, **kwargs)
@@ -19,8 +20,6 @@ class PacienteForm(forms.ModelForm):
                     self.fields[field].widget.attrs.update({
                         'class': 'form-control form-control-user'
                     })
-            
-
     class Meta:
         model = Paciente
         fields = [
