@@ -1,7 +1,7 @@
 
 
 from django import forms
-from .models import Cosmiatra
+from .models import Cosmiatra, Cosmetologa
 
 class CosmiatraForm(forms.ModelForm):
     class Meta:
@@ -10,3 +10,17 @@ class CosmiatraForm(forms.ModelForm):
         widgets = {
             'password': forms.PasswordInput(),
         }
+
+
+
+class CosmetologaForm(forms.ModelForm):
+    class Meta:
+        model = Cosmetologa
+        fields = ['nombre', 'apellido',  'telefono']
+
+        widgets = {
+            'nombre': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Nombre'}),
+            'apellido': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Apellido'}),
+            'telefono': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Telefono'})         
+        }
+        

@@ -36,7 +36,7 @@ class PacienteForm(forms.ModelForm):
             'telefono',
             'notas',
             'proximoturno',
-            #'foto',
+            'foto',
             'aviso',
         ]
 
@@ -56,6 +56,6 @@ class PacienteForm(forms.ModelForm):
             'telefono': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Telefono'}),
             'notas': forms.Textarea(attrs={'class': 'form-control', 'rows': 2, 'placeholder': 'Notas...'}),
             'proximoturno': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Proximo turno'}),
-            #'foto': forms.ClearableFileInput(),
+            'foto': forms.ClearableFileInput(attrs={'class': 'form-control'}),
             'aviso': forms.Textarea(attrs={'class': 'form-control', 'rows': 1, 'placeholder': 'Aviso'}),
         }

@@ -50,9 +50,6 @@ def crear_paciente(request):
             paciente=form.save()
             nuevo_id=paciente.id
             return redirect('listar_historiasclinicas', pk=nuevo_id)
-
-        
-
     else:
         form = PacienteForm()
 
