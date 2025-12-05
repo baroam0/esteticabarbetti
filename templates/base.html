@@ -21,7 +21,9 @@
     <!-- Custom styles for this template-->
     <!--link href="css/sb-admin-2.min.css" rel="stylesheet"-->
     <link href="{% static 'css/sb-admin-2.min.css'%}" rel="stylesheet" type="text/css">
-    
+
+    <!-- FullCalendar -->
+    <link href="{% static 'css/full-calendar-main.css'%}" rel="stylesheet" type="text/css">
 
 </head>
 
@@ -90,6 +92,13 @@
                 <a class="nav-link" href="/tratamientos/lista">
                     <i class="fas fa-fw fa-hand-holding-medical"></i>
                     <span>Tratamientos</span>
+                </a>
+            </li>
+
+            <li class="nav-item">
+                <a class="nav-link" href="/turnos/lista">
+                    <i class="fas fa-fw fa-address-book"></i>
+                    <span>Turnos</span>
                 </a>
             </li>
 
@@ -318,6 +327,9 @@
     <!-- Page level custom scripts -->
     <script src="{% static 'js/demo/chart-area-demo.js'%}"></script>
     <script src="{% static 'js/demo/chart-pie-demo.js'%}"></script>
+
+    <!-- FullCalendar -->
+    <script src="{% static 'js/full-calendar.min.js'%}"></script>
 
 </body>
     {%block js%}

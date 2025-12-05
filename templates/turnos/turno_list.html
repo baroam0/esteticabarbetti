@@ -1,0 +1,67 @@
+{% extends "base.html" %}
+{% block content %}
+
+<div class="container-fluid">
+    <h1 class="h3 mb-4 text-gray-800">Calendario de Turnos</h1>
+
+    <select id="cosmetologaFilter" class="form-control">
+        <option value="">Todas</option>
+        {% for c in cosmetologas %}
+            <option value="{{ c.id }}">{{ c.nombre }} {{ c.apellido }}</option>
+        {% endfor %}
+    </select>
+
+    <div id="calendar"></div>
+    
+</div>
+
+{% endblock %}
+
+
+
+{% block js %}
+
+<script>
+let calendar;
+
+document.addEventListener('DOMContentLoaded', function () {
+    let calendarEl = document.getElementById('calendar');
+
+    calendar = new FullCalendar.Calendar(calendarEl, {
+        initialView: 'dayGridMonth',
+        locale: 'es',
+
+        eventSources: [
+            {
+                url: '/turnos/api/turnos/',
+                method: 'GET'
+            }
+        ],
+
+        dateClick: function(info) {
+            window.location.href = "{% url 'turno_create' %}?fecha=" + info.dateStr;
+        }
+    });
+
+    calendar.render();
+});
+
+
+document.getElementById('cosmetologaFilter').addEventListener('change', function () {
+    let cosmetologaId = this.value;
+    let url = '/turnos/api/turnos/';
+    if (cosmetologaId) {
+        url += '?cosmetologa=' + cosmetologaId;
+    }
+
+    calendar.removeAllEventSources();
+
+    calendar.addEventSource({
+        url: url,
+        method: 'GET'
+    });
+});
+</script>
+
+
+{% endblock %}

@@ -40,7 +40,8 @@ INSTALLED_APPS = [
     'cosmiatras',
     'historiasclinicas',
     'pacientes',
-    'tratamientos'
+    'tratamientos',
+    'turnos'
 ]
 
 MIDDLEWARE = [
