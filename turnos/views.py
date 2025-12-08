@@ -36,6 +36,10 @@ class TurnoCreateView(CreateView):
                 pass
         return initial
 
+    def form_valid(self, form):
+        form.instance.usuario = self.request.user
+        return super().form_valid(form)
+
 
 class TurnoUpdateView(UpdateView):
     model = Turno

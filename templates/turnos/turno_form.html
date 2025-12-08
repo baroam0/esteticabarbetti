@@ -19,46 +19,10 @@
                 <div class="card-body">
                     <form method="post" enctype="multipart/form-data">
                         {% csrf_token %}
-                        
-                        <!-- Fecha y hora -->
-                        <div class="form-group">
-                            <label for="id_fecha_hora">Fecha y Hora</label>
-                            {{ form.fecha_hora }}
-                        </div>
 
-                        <!-- Modo de pago -->
-                        <div class="form-group">
-                            <label for="id_modo_pago">Modo de Pago</label>
-                            {{ form.modo_pago }}
-                        </div>
 
-                        <!-- Pagado -->
-                        <div class="form-group">
-                            <label for="id_pagado">Pagado</label>
-                            {{ form.pagado }}
-                        </div>
+                        {{form.as_p}}
 
-                        <!-- Comprobante -->
-                        <div class="form-group">
-                            <label for="id_comprobante">Comprobante (opcional)</label>
-                            {{ form.comprobante }}
-                        </div>
-
-                        <!-- Cosmetóloga -->
-                        <div class="form-group">
-                            <label for="id_cosmetologa">Cosmetóloga</label>
-                            {{ form.cosmetologa }}
-                        </div>
-
-                        <!-- Tratamientos -->
-                        <div class="form-group">
-                            <label for="id_tratamientos">Tratamientos</label>
-                            <div class="list-group">
-                                {{ form.tratamientos }}
-                            </div>
-                        </div>
-
-                        <!-- Botones -->
                         <div class="form-group mt-4">
                             <button type="submit" class="btn btn-primary">
                                 {% if form.instance.pk %}Guardar cambios{% else %}Crear turno{% endif %}

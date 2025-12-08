@@ -1,4 +1,5 @@
 from datetime import datetime
+import time
 import os
 import django
 
@@ -13,6 +14,7 @@ def cargar_hc(archivo_txt):
     historias_a_insertar = []  # lista para acumular objetos
 
     with open(archivo_txt, "r", encoding="latin-1") as f:
+        inicio = time.time()
         for linea in f:
             lineacompleta = linea.split("mariana")
             for i, l in enumerate(lineacompleta):
@@ -44,6 +46,9 @@ def cargar_hc(archivo_txt):
                     print("Error")
                     print(str(e))
                     break
+        fin = time.time()
+        diferencia = fin - inicio
+        print("Ejecucion en " + str(diferencia))
 
     # Inserción masiva en una sola operación
     if historias_a_insertar:

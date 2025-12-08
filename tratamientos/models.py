@@ -10,7 +10,7 @@ class Tratamiento(models.Model):
     fecha = models.DateTimeField(auto_now=True) 
 
     def __str__(self):
-        return self.descripcion.upper()
+        return self.descripcion.upper() + " - " + str(self.precio)
     
     def save(self, *args, **kwargs):
         self.descripcion = self.descripcion.upper()

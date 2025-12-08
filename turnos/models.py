@@ -21,7 +21,7 @@ class Turno(models.Model):
     tratamientos = models.ManyToManyField(Tratamiento, related_name='turnos')
     usuario = models.ForeignKey(User, on_delete=models.CASCADE, related_name='turnos')
     fecha_modificacion = models.DateTimeField(auto_now=True)
-    observaciones = models.CharField(max_length=500)
+    observaciones = models.CharField(max_length=500, null=True, blank=True)
     pagado = models.BooleanField(default=False)
 
     def __str__(self):

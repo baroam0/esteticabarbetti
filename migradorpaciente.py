@@ -1,5 +1,6 @@
 
 import datetime
+import time
 import os
 import django
 
@@ -18,6 +19,7 @@ def limpiar(valor):
 
 
 def cargar_pacientes(archivo_txt):
+    inicio = time.time()
     with open(archivo_txt, "r", encoding="latin-1") as f:
         next(f)
         for linea in f:
@@ -44,6 +46,9 @@ def cargar_pacientes(archivo_txt):
             )
 
             #print(f"Paciente {datos[0]} insertado correctamente.")
-        
+    fin = time.time()
+    diferencia = fin - inicio
+    print("Tiempo de ejecucion " + str(diferencia))        
+
 if __name__ == "__main__":
     cargar_pacientes("pacientes.txt")
