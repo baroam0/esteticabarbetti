@@ -53,13 +53,14 @@ class TurnoUpdateView(UpdateView):
 
 class TurnoEventsView(View):
     def get(self, request, *args, **kwargs):
-        cosmetologa_id = request.GET.get('cosmetologa')  # parámetro en la URL
+        cosmetologa_id = request.GET.get('cosmetologa')
         turnos = Turno.objects.select_related('cosmetologa').prefetch_related('tratamientos')
 
         if cosmetologa_id:
             turnos = turnos.filter(cosmetologa_id=cosmetologa_id)
 
         eventos = []
+        """
         for turno in turnos:
             eventos.append({
                 "id": turno.id,
@@ -67,6 +68,16 @@ class TurnoEventsView(View):
                 "start": turno.fecha_hora.isoformat(),
                 "url": f"/turnos/{turno.id}/editar/"
             })
+        """
+        
+        for turno in turnos:
+            eventos.append({
+                "id": turno.id,
+                "title": f"{turno.cosmetologa.nombre} - {', '.join([t.descripcion for t in turno.tratamientos.all()])}",
+                "start": turno.fecha_hora.isoformat(),
+                "url": f"/turnos/editar/{turno.id}"
+            })
+
         return JsonResponse(eventos, safe=False)
 
 
