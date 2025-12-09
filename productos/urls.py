@@ -1,0 +1,10 @@
+
+
+from django.urls import path
+from . import views
+
+urlpatterns = [
+    path('lista', views.listar_productos, name='listar_productos'),
+    path('crear/', views.crear_producto, name='crear_producto'),
+    path('editar/<int:pk>', views.editar_producto, name='editar_producto'),
+]

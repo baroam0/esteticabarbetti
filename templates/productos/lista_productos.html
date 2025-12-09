@@ -5,7 +5,7 @@
 
     <!-- Encabezado -->
     <div class="text-center mb-4">
-        <h3 class="h3 text-gray-800">Listado de Pacientes</h3>
+        <h3 class="h3 text-gray-800">Listado de Productos</h3>
     </div>
 
     <!-- Mensajes -->
@@ -20,14 +20,15 @@
         {% endfor %}
     {% endif %}
 
-    <form action="/pacientes/lista" method="GET" class="mb-3">
+    <!-- Buscador -->
+    <form action="/productos/lista" method="GET" class="mb-3">
         <div class="input-group">
-            <input class="form-control" id="txtBuscar" name="txtBuscar" placeholder="Apellido o Nombre">
+            <input class="form-control" id="txtBuscar" name="txtBuscar" placeholder="Description">
             <div class="input-group-append">
                 <!--button type="submit" class="btn btn-info" title="Buscar">
                     <i class="fas fa-search"></i>
                 </button-->
-                <button type="button" class="btn btn-primary" title="Nuevo Paciente" onclick="location.href='/pacientes/crear/'">
+                <button type="button" class="btn btn-primary" title="Nuevo Producto" onclick="location.href='/productos/crear/'">
                     <i class="fas fa-plus"></i>
                 </button>
             </div>
@@ -36,36 +37,31 @@
 
     <!-- Tabla responsiva -->
     <div class="table-responsive">
-        <table class="table table-hover table-sm" id="tablaPacientes">
+        <table class="table table-hover table-sm" id="tablaProductos">
             <thead class="thead-light">
                 <tr>
-                    <th>Apellido y Nombre</th>
-                    <th>Edad</th>
-                    <th>Domicilio</th>
-                    <th>Editar</th>
-                    <th>Historia Clínica</th>
+                    <th>Descripcion</th>
+                    <th>Precio</th>
+                    <th>Stock</th>
+                    <th>Cargado por</th>
+                    <th>Editar</th>                
                 </tr>
             </thead>
-            <tbody id="tbodyPacientes">
-                {% for paciente in pacientes %}
+            <tbody id="tbodyProductos">
+                {% for producto in resultados %}
                 <tr>
-                    <td>{{ paciente.nombre }}</td>
-                    <td>{{ paciente.edad|default:"-" }}</td>
-                    <td>{{ paciente.domicilio }}</td>
+                    <td>{{ producto.descripcion }}</td>
+                    <td> $ {{ producto.precio }}</td>
+                    <td>{{ producto.stock }}</td>
+                    <td>{{ producto.usuario }} - {{ producto.fecha_actualizacion}}</td>
                     <td>
                         <button type="button" class="btn btn-outline-secondary btn-sm" 
-                                onclick="location.href='/pacientes/editar/{{ paciente.pk }}'" 
+                                onclick="location.href='/productos/editar/{{ producto.pk }}'" 
                                 title="Editar paciente">
                             <i class="fas fa-pencil-alt"></i>
                         </button>
                     </td>
-                    <td>
-                        <button type="button" class="btn btn-outline-success btn-sm" 
-                                onclick="location.href='/historiasclinicas/lista/{{ paciente.pk }}'" 
-                                title="Historia clínica">
-                            <i class="fas fa-file-medical"></i>
-                        </button>
-                    </td>
+
                 </tr>
                 {% endfor %}
             </tbody>
@@ -105,7 +101,7 @@
 <script>
     document.getElementById("txtBuscar").addEventListener("keyup", function() {
         let query = this.value;
-        fetch(`/pacientes/buscar?q=${query}`)
+        fetch(`/productos/buscar?q=${query}`)
             .then(response => response.json())
             .then(data => {
                 let tbody = document.getElementById("tbodyPacientes");
@@ -133,3 +129,4 @@
     });
 </script>
 {% endblock %}
+

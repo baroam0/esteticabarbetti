@@ -1,0 +1,58 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="card o-hidden border-0 shadow-lg my-4">
+        <div class="card-body p-4">
+            <div class="text-center mb-4">
+                <h1 class="h4 text-gray-900">{{ accion }} Producto </h1>
+            </div>
+
+            <form method="POST" enctype="multipart/form-data">
+                {% csrf_token %}
+
+                <div class="form-row">
+                    <div class="form-group col-md-12">
+                        <label for="id_descricpion">Descripcion</label>
+                        {{ form.descripcion }}
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group col-md-12">
+                        <label for="id_precio">Precio</label>
+                        {{ form.precio }}
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="id_stock">Stock</label>
+                    {{ form.stock }}
+                </div>
+
+                <!-- Botones -->
+                <div class="form-row mt-4">
+                    <div class="col-md-6 mb-2">
+                        <button type="submit" class="btn btn-primary btn-block">
+                            Guardar Producto
+                        </button>
+                    </div>
+                    <div class="col-md-6 mb-2">
+                        <button type="button" class="btn btn-secondary btn-block" onclick="Volver()">
+                            Cancelar
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block js %}
+<script>
+    function Volver() {
+        window.location.replace("/prodcutos/lista");
+    }
+</script>
+{% endblock %}
