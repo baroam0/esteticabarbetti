@@ -46,7 +46,7 @@ class Paciente(models.Model):
                 hoy.year - self.fechanacimiento.year
                 - ((hoy.month, hoy.day) < (self.fechanacimiento.month, self.fechanacimiento.day))
             )
-        return None
+        return ""
     
     class Meta:
         verbose_name_plural = "Pacientes"

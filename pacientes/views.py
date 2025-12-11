@@ -13,20 +13,21 @@ from .models import Paciente
 def listar_pacientes(request):
     if "txtBuscar" in request.GET:
         parametro = request.GET.get('txtBuscar')
-        pacientes = Paciente.objects.filter(nombre__contains=parametro)
+        pacientes =  Paciente.objects.filter(nombre__contains=parametro)
     else:
-        pacientes = Paciente.objects.all().order_by("nombre")
-    paginador = Paginator(pacientes, 10)
+        pacientes =  Paciente.objects.all().order_by("nombre")
+    paginador = Paginator(pacientes, 15)
 
     if "page" in request.GET:
         page = request.GET.get('page')
     else:
         page = 1
+    resultados = paginador.get_page(page)
 
-    pacientes = paginador.get_page(page)
-    return render(request, 'pacientes/lista_pacientes.html', {'pacientes': pacientes})
+    return render(request, 'pacientes/lista_pacientes.html', {'results': resultados})
 
 
+"""
 @login_required
 def buscar_pacientes(request):
     parametro = request.GET.get('q', '')
@@ -41,6 +42,39 @@ def buscar_pacientes(request):
             "domicilio": p.domicilio,
         })
     return JsonResponse(data, safe=False)
+"""
+
+@login_required
+def buscar_pacientes(request):
+    parametro = request.GET.get('q', '')
+    page_number = request.GET.get('page', 1)
+
+    if parametro:
+        pacientes = Paciente.objects.filter(
+            nombre__icontains=parametro
+        ).order_by("nombre")
+    else:
+        pacientes = Paciente.objects.all().order_by("nombre")
+
+    paginator = Paginator(pacientes, 15)
+    page_obj = paginator.get_page(page_number)
+
+    data = [{
+        "id": p.pk,
+        "nombre": p.nombre,
+        "edad": p.edad(),
+        "domicilio": p.domicilio
+    } for p in page_obj]
+
+    return JsonResponse({
+        "results": data,
+        "page": page_obj.number,
+        "total_pages": paginator.num_pages,
+        "has_next": page_obj.has_next(),
+        "has_previous": page_obj.has_previous(),
+        "next_page": page_obj.next_page_number() if page_obj.has_next() else None,
+        "prev_page": page_obj.previous_page_number() if page_obj.has_previous() else None,
+    })
 
 
 def crear_paciente(request):
