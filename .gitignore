@@ -1,3 +1,5 @@
 /esteticabarbetti/settings.py
 db.sqlite3
 *.pyc 
+*.jpg
+*.png

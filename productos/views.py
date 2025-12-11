@@ -25,23 +25,42 @@ def listar_productos(request):
         page = 1
     resultados = paginador.get_page(page)
 
-    return render(request, 'productos/lista_productos.html', {'resultados': resultados})
+    return render(request, 'productos/lista_productos.html', {'results': resultados})
 
 
 @login_required
-def buscar_producto(request):
+def buscar_productos(request):
     parametro = request.GET.get('q', '')
-    productos = Producto.objects.filter(descripcion__icontains=parametro).order_by("descripcion")
+    page_number = request.GET.get('page', 1)
 
-    data = []
-    for p in productos:
-        data.append({
-            "id": p.pk,
-            "descripcion": p.nombre,
-            "precion": p.edad(),
-            "stock": p.edad(),
-        })
-    return JsonResponse(data, safe=False)
+    if parametro:
+        productos = Producto.objects.filter(
+            descripcion__icontains=parametro
+        ).order_by("descripcion")
+    else:
+        productos =  Producto.objects.all().order_by("descripcion")
+
+    paginator = Paginator(productos, 15)
+    page_obj = paginator.get_page(page_number)
+
+    data = [{
+        "id": p.pk,
+        "descripcion": p.descripcion,
+        "precio": p.precio,
+        "stock": p.stock,
+        "fecha_actualizacion": p.fecha_actualizacion.strftime("%d %b. %Y %H:%M"),
+        "usuario": p.usuario.username
+    } for p in page_obj]
+
+    return JsonResponse({
+        "results": data,
+        "page": page_obj.number,
+        "total_pages": paginator.num_pages,
+        "has_next": page_obj.has_next(),
+        "has_previous": page_obj.has_previous(),
+        "next_page": page_obj.next_page_number() if page_obj.has_next() else None,
+        "prev_page": page_obj.previous_page_number() if page_obj.has_previous() else None,
+    })
 
 
 @login_required
@@ -102,3 +121,4 @@ def listar_historial(request):
     return render(request, 'productos/lista_productos.html', {'resultados': resultados})
 
 # Create your views here.
+
