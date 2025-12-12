@@ -34,11 +34,13 @@
                 <div class="form-row mt-4">
                     <div class="col-md-6 mb-2">
                         <button type="submit" class="btn btn-primary btn-block">
+                            <i class="fas fa-save"></i>
                             Guardar Producto
                         </button>
                     </div>
                     <div class="col-md-6 mb-2">
                         <button type="button" class="btn btn-secondary btn-block" onclick="Volver()">
+                            <i class="fas fa-undo"></i>
                             Cancelar
                         </button>
                     </div>
@@ -52,7 +54,7 @@
 {% block js %}
 <script>
     function Volver() {
-        window.location.replace("/prodcutos/lista");
+        window.location.replace("/productos/lista");
     }
 </script>
 {% endblock %}

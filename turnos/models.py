@@ -17,6 +17,7 @@ class Turno(models.Model):
     fecha_hora = models.DateTimeField()
     modo_pago = models.CharField(max_length=2, choices=MODO_PAGO_CHOICES)
     comprobante = models.FileField(upload_to='comprobantes/', blank=True, null=True)
+    monto = models.DecimalField(max_digits=15, decimal_places=2, null=True, blank=True)
     cosmetologa = models.ForeignKey(Cosmetologa, on_delete=models.CASCADE, related_name='turnos')
     tratamientos = models.ManyToManyField(Tratamiento, related_name='turnos')
     usuario = models.ForeignKey(User, on_delete=models.CASCADE, related_name='turnos')
