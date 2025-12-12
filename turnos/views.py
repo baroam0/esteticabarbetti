@@ -1,13 +1,18 @@
 
 from datetime import datetime
+
+from django.contrib import messages
+from django.http import JsonResponse
 from django.views.generic import ListView, CreateView, UpdateView
 from django.views import View
 from django.urls import reverse_lazy
-from django.http import JsonResponse
+from django.shortcuts import redirect
+
 from .models import Turno
 from .forms import TurnoForm
 
 from cosmiatras.models import Cosmetologa
+from productos.models import HistorialProducto
 
 class TurnoListView(ListView):
     model = Turno
@@ -38,8 +43,27 @@ class TurnoCreateView(CreateView):
 
     def form_valid(self, form):
         form.instance.usuario = self.request.user
-        return super().form_valid(form)
+        response = super().form_valid(form)
+        
+        productos_seleccionados = form.cleaned_data.get('productos')
 
+        for producto in productos_seleccionados:
+            if producto.stock <= 0:
+                messages.error(self.request, f"El producto {producto.descripcion} no tiene stock disponible.")
+                return redirect("turno_create")  # o donde corresponda
+
+            producto.stock -= 1
+            producto.save()
+
+            HistorialProducto.objects.create(
+                producto=producto,
+                usuario=self.request.user,
+                precio_registrado=producto.precio,
+                stock_registrado=producto.stock,
+                accion="EDITADO"
+            )
+
+        return response
 
 class TurnoUpdateView(UpdateView):
     model = Turno
@@ -49,7 +73,37 @@ class TurnoUpdateView(UpdateView):
 
     def form_valid(self, form):
         form.instance.usuario = self.request.user
-        return super().form_valid(form)
+
+        # 1. Productos antes de editar
+        turno_original = Turno.objects.get(pk=self.object.pk)
+        productos_antes = set(turno_original.productos.all())
+
+        # 2. Productos después de editar (del formulario)
+        response = super().form_valid(form)
+        productos_despues = set(form.cleaned_data['productos'])
+
+        # 3. Productos quitados
+        productos_quitados = productos_antes - productos_despues
+
+        # 4. Productos agregados
+        productos_agregados = productos_despues - productos_antes
+
+        # ✅ Devolver stock de productos quitados
+        for producto in productos_quitados:
+            producto.stock += 1
+            producto.save()
+
+        # ✅ Descontar stock de productos agregados
+        for producto in productos_agregados:
+            if producto.stock > 0:
+                producto.stock -= 1
+                producto.save()
+            else:
+                messages.error(self.request, f"El producto {producto.descripcion} no tiene stock disponible.")
+                return redirect("turno_update", pk=self.object.pk)
+
+        return response
+
 
 class TurnoEventsView(View):
     def get(self, request, *args, **kwargs):
@@ -60,15 +114,6 @@ class TurnoEventsView(View):
             turnos = turnos.filter(cosmetologa_id=cosmetologa_id)
 
         eventos = []
-        """
-        for turno in turnos:
-            eventos.append({
-                "id": turno.id,
-                "title": f"{turno.cosmetologa.nombre} - {', '.join([t.descripcion for t in turno.tratamientos.all()])}",
-                "start": turno.fecha_hora.isoformat(),
-                "url": f"/turnos/{turno.id}/editar/"
-            })
-        """
         
         for turno in turnos:
             eventos.append({

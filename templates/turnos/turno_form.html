@@ -77,6 +77,45 @@
                             </div>
                         </div>
 
+                        {% if messages %}
+                            <ul class="messages">
+                            {% for message in messages %}
+                                <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
+                            {% endfor %}
+                            </ul>
+                        {% endif %}
+
+
+                        <!-- Productos con estilo SB Admin 2 -->
+                        <div class="form-group">
+                            <label for="id_productos">Productos utilizados</label>
+                            <div class="row">
+                                {% for p in form.fields.productos.queryset %}
+                                <div class="col-md-4 mb-2">
+                                <div class="card shadow-sm p-2">
+                                  <div class="form-check">
+                                        <input 
+                                            type="checkbox"
+                                            name="productos"
+                                            value="{{ p.id }}"
+                                            class="producto-checkbox"
+                                            data-precio="{{ p.precio }}"
+                                            data-stock="{{ p.stock }}"
+                                            {% if p.id in form.initial.productos %}checked{% endif %}
+                                        >
+                                        <label class="form-check-label">
+                                            {{ p.descripcion }} — ${{ p.precio }}  
+                                            <br>
+                                            <small class="text-muted">Stock: {{ p.stock }}</small>
+                                        </label>
+                                    </div>
+                                </div>
+                                </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+
+
                         <div class="form-group">
                         <label for="id_observaciones">Observaciones</label>
                             {{ form.observaciones }}

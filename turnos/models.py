@@ -3,7 +3,9 @@ from django.db import models
 from django.contrib.auth.models import User
 
 from cosmiatras.models import Cosmetologa
+from productos.models import Producto
 from tratamientos.models import Tratamiento
+
 
 
 class Turno(models.Model):
@@ -20,6 +22,7 @@ class Turno(models.Model):
     monto = models.DecimalField(max_digits=15, decimal_places=2, null=True, blank=True)
     cosmetologa = models.ForeignKey(Cosmetologa, on_delete=models.CASCADE, related_name='turnos')
     tratamientos = models.ManyToManyField(Tratamiento, related_name='turnos')
+    productos = models.ManyToManyField(Producto, related_name='consumos')
     usuario = models.ForeignKey(User, on_delete=models.CASCADE, related_name='turnos')
     fecha_modificacion = models.DateTimeField(auto_now=True)
     observaciones = models.CharField(max_length=500, null=True, blank=True)

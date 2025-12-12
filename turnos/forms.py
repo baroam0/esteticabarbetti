@@ -7,7 +7,7 @@ class TurnoForm(forms.ModelForm):
 
         fields = [
             'fecha_hora', 'monto', 'modo_pago', 'pagado', 
-            'comprobante', 'cosmetologa', 'tratamientos', 'observaciones'
+            'comprobante', 'cosmetologa', 'tratamientos', 'productos', 'observaciones'
         ]
 
         widgets = {
@@ -27,5 +27,6 @@ class TurnoForm(forms.ModelForm):
             'comprobante': forms.ClearableFileInput(attrs={'class': 'form-control'}),            
             'cosmetologa': forms.Select(attrs={'class': 'form-control'}),
             'tratamientos': forms.CheckboxSelectMultiple(),
+            'productos': forms.CheckboxSelectMultiple(),
             'observaciones': forms.Select(attrs={'class': 'form-control'}),
         }
