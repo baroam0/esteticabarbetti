@@ -50,6 +50,12 @@
                     <td>{{ producto.precio_registrado }}</td>
                     <td>{{ producto.stock_registrado }} </td>
                     <td>{{ producto.accion }} </td>
+                    {% if producto.observaciones %}
+                    <td>{{ producto.observaciones }} </td>
+                    {%else%}
+                    <td> </td>
+                    {%endif%}
+
                     <td>{{ producto.observaciones }} </td>
                 </tr>
                 {% endfor %}
