@@ -11,14 +11,11 @@
     <!-- Mensajes -->
     {% if messages %}
         {% for message in messages %}
-            <div class="alert alert-{{message.tags}} alert-dismissible fade show" role="alert">
-                {{message}}
-                <button type="button" class="close" data-dismiss="alert" aria-label="Cerrar">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-            </div>
+        <div class="px-1 py-3 bg-gradient-warning text-white">
+            {{message}}
+        </div>
         {% endfor %}
-    {% endif %}
+    {% endif %} 
 
     <!-- Buscador -->
     <form action="/productos/lista" method="GET" class="mb-3">
@@ -41,7 +38,12 @@
                     <th>Precio</th>
                     <th>Stock</th>
                     <th>Cargado por</th>
-                    <th>Editar</th>                
+                    <th>Editar</th>
+
+                    {% if user.is_staff %}
+                    <th>Historial</th>
+                    {%endif%}
+
                 </tr>
             </thead>
             <tbody id="tbodyProductos">
@@ -57,6 +59,14 @@
                             <i class="fas fa-pencil-alt"></i>
                         </button>
                     </td>
+                    {% if user.is_staff %}
+                    <td>
+                        <button type="button" class="btn btn-outline-secondary btn-sm" 
+                                onclick="location.href='/productos/historial/lista/{{ producto.pk }}'">
+                            <i class="fas fa-history"></i>
+                        </button>
+                    </td>
+                    {%endif%}
                 </tr>
                 {% endfor %}
             </tbody>

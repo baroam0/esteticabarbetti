@@ -28,5 +28,5 @@ class TurnoForm(forms.ModelForm):
             'cosmetologa': forms.Select(attrs={'class': 'form-control'}),
             'tratamientos': forms.CheckboxSelectMultiple(),
             'productos': forms.CheckboxSelectMultiple(),
-            'observaciones': forms.Select(attrs={'class': 'form-control'}),
+            'observaciones': forms.Textarea(attrs={'class': 'form-control', 'rows': 2 }),
         }

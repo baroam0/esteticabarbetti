@@ -7,7 +7,6 @@ from productos.models import Producto
 from tratamientos.models import Tratamiento
 
 
-
 class Turno(models.Model):
     MODO_PAGO_CHOICES = [
         ('EF', 'Efectivo'),
@@ -22,7 +21,7 @@ class Turno(models.Model):
     monto = models.DecimalField(max_digits=15, decimal_places=2, null=True, blank=True)
     cosmetologa = models.ForeignKey(Cosmetologa, on_delete=models.CASCADE, related_name='turnos')
     tratamientos = models.ManyToManyField(Tratamiento, related_name='turnos')
-    productos = models.ManyToManyField(Producto, related_name='consumos')
+    productos = models.ManyToManyField(Producto, related_name='consumos', blank=True)
     usuario = models.ForeignKey(User, on_delete=models.CASCADE, related_name='turnos')
     fecha_modificacion = models.DateTimeField(auto_now=True)
     observaciones = models.CharField(max_length=500, null=True, blank=True)

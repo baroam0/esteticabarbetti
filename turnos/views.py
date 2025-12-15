@@ -60,10 +60,12 @@ class TurnoCreateView(CreateView):
                 usuario=self.request.user,
                 precio_registrado=producto.precio,
                 stock_registrado=producto.stock,
-                accion="EDITADO"
+                accion="TURNO",
+                observaciones=f"Fecha del turno: {form.instance.fecha_hora.strftime('%d-%m-%Y %H:%M')}"
             )
 
         return response
+
 
 class TurnoUpdateView(UpdateView):
     model = Turno
@@ -74,33 +76,39 @@ class TurnoUpdateView(UpdateView):
     def form_valid(self, form):
         form.instance.usuario = self.request.user
 
-        # 1. Productos antes de editar
         turno_original = Turno.objects.get(pk=self.object.pk)
         productos_antes = set(turno_original.productos.all())
-
-        # 2. Productos después de editar (del formulario)
-        response = super().form_valid(form)
         productos_despues = set(form.cleaned_data['productos'])
 
-        # 3. Productos quitados
         productos_quitados = productos_antes - productos_despues
-
-        # 4. Productos agregados
         productos_agregados = productos_despues - productos_antes
 
-        # ✅ Devolver stock de productos quitados
+        for producto in productos_agregados:
+            if producto.stock <= 0:
+                messages.error(
+                    self.request,
+                    f"El producto {producto.descripcion} no tiene stock disponible."
+                )
+                return self.form_invalid(form)
+
+        response = super().form_valid(form)
+
         for producto in productos_quitados:
             producto.stock += 1
             producto.save()
 
-        # ✅ Descontar stock de productos agregados
         for producto in productos_agregados:
-            if producto.stock > 0:
-                producto.stock -= 1
-                producto.save()
-            else:
-                messages.error(self.request, f"El producto {producto.descripcion} no tiene stock disponible.")
-                return redirect("turno_update", pk=self.object.pk)
+            producto.stock -= 1
+            producto.save()
+        
+        HistorialProducto.objects.create(
+            producto=producto,
+            usuario=self.request.user,
+            precio_registrado=producto.precio,
+            stock_registrado=producto.stock,
+            accion="TURNO",
+            observaciones=f"Fecha del turno: {form.instance.fecha_hora.strftime('%d-%m-%Y %H:%M')}"
+        )
 
         return response
 
@@ -124,6 +132,5 @@ class TurnoEventsView(View):
             })
 
         return JsonResponse(eventos, safe=False)
-
 
 # Create your views here.

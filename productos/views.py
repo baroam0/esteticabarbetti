@@ -108,9 +108,10 @@ def editar_producto(request, pk):
 
 
 @login_required
-def listar_historial(request):
-    productos =  Producto.objects.all().order_by("descripcion")
-    paginador = Paginator(productos, 15)
+def listar_historial(request, pk):
+    producto =  Producto.objects.get(pk=pk)
+    historial = HistorialProducto.objects.filter(producto=producto).order_by("-fecha_modificacion")
+    paginador = Paginator(historial, 15)
 
     if "page" in request.GET:
         page = request.GET.get('page')
@@ -118,7 +119,14 @@ def listar_historial(request):
         page = 1
     resultados = paginador.get_page(page)
 
-    return render(request, 'productos/lista_productos.html', {'resultados': resultados})
+    return render(
+        request, 
+        'productos/lista_historial.html', 
+        {
+            'results': resultados,
+            'producto': producto.descripcion
+        }
+    )
 
 # Create your views here.
 

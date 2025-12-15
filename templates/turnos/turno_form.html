@@ -3,7 +3,6 @@
 
 {% block content %}
 <div class="container-fluid">
-    <!-- Título dinámico -->
     <h1 class="h3 mb-4 text-gray-800">
         {% if form.instance.pk %}Editar Turno{% else %}Nuevo Turno{% endif %}
     </h1>
@@ -27,97 +26,96 @@
 
                         <div class="form-group">
                             <label for="id_monto">Monto</label>
-                                {{ form.monto }}
+                            {{ form.monto }}
                         </div>
 
                         <div class="form-group">
                             <label for="id_modo_pago">Modo de pago</label>
-                                {{ form.modo_pago }}
+                            {{ form.modo_pago }}
                         </div>
 
                         <div class="form-group">
                             <label for="id_pagado">Pagado</label>
-                                {{ form.pagado }}
+                            {{ form.pagado }}
                         </div>
 
                         <div class="form-group">
                             <label for="id_comprobante">Comprobante</label>
-                                {{ form.comprobante }}
+                            {{ form.comprobante }}
                         </div>
 
                         <div class="form-group">
                             <label for="id_cosmetologa">Cosmetóloga</label>
-                                {{ form.cosmetologa }}
-                        </div>
-
-                        <!-- Tratamientos con estilo SB Admin 2 -->
-                        <div class="form-group">
-                            <label for="id_tratamientos">Tratamientos</label>
-                            <div class="row">
-                            {% for t in form.fields.tratamientos.queryset %}
-                                <div class="col-md-4 mb-2">
-                                    <div class="card shadow-sm p-2">
-                                        <div class="form-check">
-                                            <input 
-                                                type="checkbox"
-                                                name="tratamientos"
-                                                value="{{ t.id }}"
-                                                class="tratamiento-checkbox"
-                                                data-precio="{{ t.precio }}"
-                                                {% if t.id in form.initial.tratamientos %}checked{% endif %}
-                                            >
-                                            <label class="form-check-label">
-                                                {{ t.descripcion }} — ${{ t.precio }}
-                                            </label>
-                                        </div>
-                                    </div>
-                                </div>
-                            {% endfor %}
-
-                            </div>
+                            {{ form.cosmetologa }}
                         </div>
 
                         {% if messages %}
-                            <ul class="messages">
                             {% for message in messages %}
-                                <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
+                            <div class="px-1 py-3 bg-gradient-warning text-white">
+                                {{message}}
+                            </div>
                             {% endfor %}
-                            </ul>
-                        {% endif %}
+                        {% endif %} 
 
-
-                        <!-- Productos con estilo SB Admin 2 -->
+                        <!-- Tratamientos con cards -->
                         <div class="form-group">
-                            <label for="id_productos">Productos utilizados</label>
+                            <label for="id_tratamientos">Tratamientos</label>
                             <div class="row">
-                                {% for p in form.fields.productos.queryset %}
-                                <div class="col-md-4 mb-2">
-                                <div class="card shadow-sm p-2">
-                                  <div class="form-check">
-                                        <input 
-                                            type="checkbox"
-                                            name="productos"
-                                            value="{{ p.id }}"
-                                            class="producto-checkbox"
-                                            data-precio="{{ p.precio }}"
-                                            data-stock="{{ p.stock }}"
-                                            {% if p.id in form.initial.productos %}checked{% endif %}
-                                        >
-                                        <label class="form-check-label">
-                                            {{ p.descripcion }} — ${{ p.precio }}  
-                                            <br>
-                                            <small class="text-muted">Stock: {{ p.stock }}</small>
-                                        </label>
+                                {% for t in form.fields.tratamientos.queryset %}
+                                    <div class="col-md-4 mb-2">
+                                        <div class="card shadow-sm p-2">
+                                            <div class="form-check">
+                                                <input 
+                                                    type="checkbox"
+                                                    name="tratamientos"
+                                                    value="{{ t.id }}"
+                                                    class="form-check-input tratamiento-checkbox"
+                                                    data-precio="{{ t.precio }}"
+                                                    id="tratamiento_{{ t.id }}"
+                                                    {% if t in form.instance.tratamientos.all %}checked{% endif %}
+                                                >
+                                                <label class="form-check-label" for="tratamiento_{{ t.id }}">
+                                                    {{ t.descripcion }} — ${{ t.precio }}
+                                                </label>
+                                            </div>
+                                        </div>
                                     </div>
-                                </div>
-                                </div>
                                 {% endfor %}
                             </div>
                         </div>
 
+                        <!-- Productos con cards -->
+                        <div class="form-group">
+                            <label for="id_productos">Productos utilizados</label>
+                            <div class="row">
+                                {% for p in form.fields.productos.queryset %}
+                                    <div class="col-md-4 mb-2">
+                                        <div class="card shadow-sm p-2">
+                                            <div class="form-check">
+                                                <input 
+                                                    type="checkbox"
+                                                    name="productos"
+                                                    value="{{ p.id }}"
+                                                    class="form-check-input producto-checkbox"
+                                                    data-precio="{{ p.precio }}"
+                                                    data-stock="{{ p.stock }}"
+                                                    id="producto_{{ p.id }}"
+                                                    {% if p in form.instance.productos.all %}checked{% endif %}
+                                                >
+                                                <label class="form-check-label" for="producto_{{ p.id }}">
+                                                    {{ p.descripcion }} — ${{ p.precio }}  
+                                                    <br>
+                                                    <small class="text-muted">Stock: {{ p.stock }}</small>
+                                                </label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                {% endfor %}
+                            </div>
+                        </div>
 
                         <div class="form-group">
-                        <label for="id_observaciones">Observaciones</label>
+                            <label for="id_observaciones">Observaciones</label>
                             {{ form.observaciones }}
                         </div>
 
@@ -135,8 +133,6 @@
                                 </button>
                             </div>
                         </div>
-
-                        
                     </form>
                 </div>
             </div>
@@ -146,35 +142,35 @@
 {% endblock %}
 
 {% block js %}
-    <script>
-        
-        function Volver() {
-            window.location.replace("/turnos/lista");
-        }
+<script>
+function Volver() {
+    window.location.replace("/turnos/lista");
+}
 
+document.addEventListener("DOMContentLoaded", function () {
+    const montoInput = document.getElementById("id_monto");
 
-        document.addEventListener("DOMContentLoaded", function () {
-            const checkboxes = document.querySelectorAll(".tratamiento-checkbox");
-            const montoInput = document.getElementById("id_monto");
+    function actualizarMonto() {
+        let total = 0;
 
-            function actualizarMonto() {
-                let total = 0;
-
-                checkboxes.forEach(cb => {
-                    if (cb.checked) {
-                        total += parseFloat(cb.dataset.precio);
-                    }
-                });
-
-                montoInput.value = total.toFixed(2);
-            }
-
-            checkboxes.forEach(cb => {
-            cb.addEventListener("change", actualizarMonto);
+        document.querySelectorAll(".tratamiento-checkbox:checked").forEach(cb => {
+            total += parseFloat(cb.dataset.precio);
         });
 
-        actualizarMonto();
+        /*
+        document.querySelectorAll(".producto-checkbox:checked").forEach(cb => {
+            total += parseFloat(cb.dataset.precio);
+        });
+        */
+
+        montoInput.value = total.toFixed(2);
+    }
+
+    document.querySelectorAll(".tratamiento-checkbox, .producto-checkbox").forEach(cb => {
+        cb.addEventListener("change", actualizarMonto);
     });
 
-    </script>
+    actualizarMonto();
+});
+</script>
 {% endblock %}

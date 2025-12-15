@@ -26,8 +26,9 @@ class HistorialProducto(models.Model):
 
     precio_registrado = models.DecimalField(max_digits=20, decimal_places=2)
     stock_registrado = models.IntegerField()
-    
-    accion = models.CharField(max_length=10, choices=[('CREADO', 'Creado'), ('EDITADO', 'Editado')])
+
+    accion = models.CharField(max_length=20, choices=[('CREADO', 'Creado'), ('EDITADO', 'Editado'), ('TURNO', 'Turno')])
+    observaciones = models.CharField(max_length=500, null=True, blank=True)
 
     def __str__(self):
         return f'{self.accion} {self.producto.descripcion} por {self.usuario.username if self.usuario else "Sistema"} el {self.fecha_modificacion.strftime("%Y-%m-%d %H:%M")}'
