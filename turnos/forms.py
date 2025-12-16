@@ -1,18 +1,23 @@
 from django import forms
 from .models import Turno
 
+
 class TurnoForm(forms.ModelForm):
     class Meta:
+
         model = Turno
 
         fields = [
             'fecha_hora', 'monto', 'modo_pago', 'pagado', 
             'comprobante', 'cosmetologa', 'tratamientos', 'productos', 'observaciones'
-        ]
+        ]        
 
         widgets = {
             'fecha_hora': forms.DateTimeInput(
-                attrs={'type': 'datetime-local', 'class':'form-control'},
+                attrs={
+                    'type': 'datetime-local',
+                    'class': 'form-control'
+                },
                 format='%Y-%m-%dT%H:%M'
             ),
             'monto': forms.NumberInput(
@@ -30,3 +35,8 @@ class TurnoForm(forms.ModelForm):
             'productos': forms.CheckboxSelectMultiple(),
             'observaciones': forms.Textarea(attrs={'class': 'form-control', 'rows': 2 }),
         }
+
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['fecha_hora'].input_formats = ['%Y-%m-%dT%H:%M']
