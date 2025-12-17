@@ -16,7 +16,7 @@ def listar_pacientes(request):
         pacientes =  Paciente.objects.filter(nombre__contains=parametro)
     else:
         pacientes =  Paciente.objects.all().order_by("nombre")
-    paginador = Paginator(pacientes, 15)
+    paginador = Paginator(pacientes, 10)
 
     if "page" in request.GET:
         page = request.GET.get('page')
@@ -26,23 +26,6 @@ def listar_pacientes(request):
 
     return render(request, 'pacientes/lista_pacientes.html', {'results': resultados})
 
-
-"""
-@login_required
-def buscar_pacientes(request):
-    parametro = request.GET.get('q', '')
-    pacientes = Paciente.objects.filter(nombre__icontains=parametro).order_by("nombre")[:10]
-
-    data = []
-    for p in pacientes:
-        data.append({
-            "id": p.pk,
-            "nombre": p.nombre,
-            "edad": p.edad(),
-            "domicilio": p.domicilio,
-        })
-    return JsonResponse(data, safe=False)
-"""
 
 @login_required
 def buscar_pacientes(request):
@@ -56,7 +39,7 @@ def buscar_pacientes(request):
     else:
         pacientes = Paciente.objects.all().order_by("nombre")
 
-    paginator = Paginator(pacientes, 15)
+    paginator = Paginator(pacientes, 10)
     page_obj = paginator.get_page(page_number)
 
     data = [{
