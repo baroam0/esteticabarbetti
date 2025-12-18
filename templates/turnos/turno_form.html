@@ -57,7 +57,6 @@
                             {% endfor %}
                         {% endif %} 
 
-                        <!-- Tratamientos con cards -->
                         <div class="form-group">
                             <label for="id_tratamientos">Tratamientos</label>
                             <div class="row">
@@ -84,41 +83,118 @@
                             </div>
                         </div>
 
-                        <!-- Productos con cards -->
-                        <div class="form-group">
-                            <label for="id_productos">Productos utilizados</label>
-                            <div class="row">
-                                {% for p in form.fields.productos.queryset %}
-                                    <div class="col-md-4 mb-2">
-                                        <div class="card shadow-sm p-2">
-                                            <div class="form-check">
-                                                <input 
-                                                    type="checkbox"
-                                                    name="productos"
-                                                    value="{{ p.id }}"
-                                                    class="form-check-input producto-checkbox"
-                                                    data-precio="{{ p.precio }}"
-                                                    data-stock="{{ p.stock }}"
-                                                    id="producto_{{ p.id }}"
-                                                    {% if p in form.instance.productos.all %}checked{% endif %}
-                                                >
-                                                <label class="form-check-label" for="producto_{{ p.id }}">
-                                                    {{ p.descripcion }} — ${{ p.precio }}  
-                                                    <br>
-                                                    <small class="text-muted">Stock: {{ p.stock }}</small>
+
+                        <div class="card shadow mb-4">
+                            <div class="card-header py-3 bg-light">
+                                <h6 class="m-0 font-weight-bold text-primary">Consumo de Productos (Fraccionable)</h6>
+                            </div>
+                            
+                            <div class="card-body">
+        
+                                <label>Selecciona los productos utilizados:</label>
+                                    <div class="row mb-4" id="productos-checkbox-list" style="max-height: 200px; overflow-y: auto;">
+                                    {% for p in form.fields.productos.queryset %}
+                                        <div class="col-md-4 mb-2">
+                                            <div class="input-group input-group-sm">
+                                                <div class="input-group-prepend">
+                                                    <div class="input-group-text">
+                                                        <input 
+                                                            type="checkbox"
+                                                            value="{{ p.id }}"
+                                                            class="producto-selector"
+                                                            data-descripcion="{{ p.descripcion }}"
+                                                            data-stock="{{ p.stock }}"
+                                                            id="chk_prod_{{ p.id }}"
+                                                        >
+                                                    </div>
+                                                </div>
+                                                <label class="form-control bg-white" for="chk_prod_{{ p.id }}" style="font-size: 0.85rem;">
+                                                    {{ p.descripcion }} <span class="badge badge-info float-right">${{ p.precio }}</span>
+                                                    <br><!--small class="text-muted">Stock: {{ p.stock }}</small-->
                                                 </label>
                                             </div>
                                         </div>
+                                    {% endfor %}
                                     </div>
-                                {% endfor %}
+
+                                    <label class="font-weight-bold">Detalle de consumo:</label>
+                                    {{ formset.management_form }}
+        
+                                    <div id="formset-container">
+                                    {% for form_producto in formset %}
+                                        <div class="form-row formset-item align-items-center mb-2" id="row-{{ form_producto.prefix }}">
+                                        {{ form_producto.id }}
+                                        {{ form_producto.producto }}
+                                        <span class="d-none">{{ form_producto.DELETE }}</span>
+
+                                        <div class="col-md-5">
+                                            <input type="text" class="form-control-plaintext form-control-sm font-weight-bold" 
+                                                value="{{ form_producto.instance.producto.descripcion }}" readonly>
+                                        </div>
+                                        
+                                        <div class="col-md-3">
+                                            <div class="input-group input-group-sm">
+                                                <div class="input-group-prepend">
+                                                    <span class="input-group-text">Cant.</span>
+                                                </div>
+                                                {{ form_producto.cantidad_consumida }}
+                                            </div>
+                                        </div>
+                                        <div class="col-md-3">
+                                            <small class="text-muted">Stock actual: {{ form_producto.stock_actual.initial }}</small>
+                                        </div>
+                                        <div class="col-md-1 text-right">
+                                            <button type="button" class="btn btn-danger btn-sm btn-remove-item" data-prefix="{{ form_producto.prefix }}">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                        </div>
+                                        </div>
+                                        {% if form_producto.errors %}
+                                            <div class="alert alert-danger p-1"><small>{{ form_producto.errors }}</small></div>
+                                        {% endif %}
+                                    {% endfor %}
+                                    </div>
+
+                                    <div id="empty-form-template" class="d-none">
+                                        <div class="form-row formset-item align-items-center mb-2" id="row-__prefix__">
+                                            {{ formset.empty_form.id }}
+                                            {{ formset.empty_form.producto }}
+                                            <span class="d-none">{{ formset.empty_form.DELETE }}</span>
+
+                                            <div class="col-md-5">
+                                                <input type="text" class="form-control-plaintext form-control-sm font-weight-bold descripcion-visual" readonly>
+                                            </div>
+                                        
+                                        <div class="col-md-3">
+                                            <div class="input-group input-group-sm">
+                                                <div class="input-group-prepend">
+                                                    <span class="input-group-text">Cant.</span>
+                                                </div>
+                                                {{ formset.empty_form.cantidad_consumida }} 
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="col-md-3">
+                                            <small class="text-muted stock-visual">Stock: --</small>
+                                        </div>
+                                        
+                                        <div class="col-md-1 text-right">
+                                            <button type="button" class="btn btn-danger btn-sm btn-remove-item" data-prefix="__prefix__">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+
                             </div>
                         </div>
 
+
+                        
                         <div class="form-group">
                             <label for="id_observaciones">Observaciones</label>
                             {{ form.observaciones }}
                         </div>
-
                         <div class="form-row mt-4">
                             <div class="col-md-6 mb-2">
                                 <button type="submit" class="btn btn-primary btn-block">
@@ -147,30 +223,102 @@ function Volver() {
     window.location.replace("/turnos/lista");
 }
 
+
+
 document.addEventListener("DOMContentLoaded", function () {
-    const montoInput = document.getElementById("id_monto");
+    const totalFormsInput = document.getElementById("id_turnoproducto_set-TOTAL_FORMS");
+    const container = document.getElementById("formset-container");
+    const templateRow = document.getElementById("empty-form-template").innerHTML;
 
-    function actualizarMonto() {
-        let total = 0;
-
-        document.querySelectorAll(".tratamiento-checkbox:checked").forEach(cb => {
-            total += parseFloat(cb.dataset.precio);
-        });
-
-        /*
-        document.querySelectorAll(".producto-checkbox:checked").forEach(cb => {
-            total += parseFloat(cb.dataset.precio);
-        });
-        */
-
-        montoInput.value = total.toFixed(2);
-    }
-
-    document.querySelectorAll(".tratamiento-checkbox, .producto-checkbox").forEach(cb => {
-        cb.addEventListener("change", actualizarMonto);
+    document.querySelectorAll(".formset-item").forEach(row => {
+        const productoInput = row.querySelector('input[name$="-producto"]');
+        const deleteInput = row.querySelector('input[name$="-DELETE"]');
+        
+        if (productoInput && productoInput.value) {
+            if (!deleteInput.checked) {
+                const checkbox = document.querySelector(`.producto-selector[value="${productoInput.value}"]`);
+                if (checkbox) {
+                    checkbox.checked = true;
+                    checkbox.dataset.formPrefix = row.id.replace('row-', ''); 
+                }
+            } else {
+                row.classList.add('d-none');
+            }
+        }
     });
 
-    actualizarMonto();
+    document.querySelectorAll(".producto-selector").forEach(cb => {
+        cb.addEventListener("change", function() {
+            if (this.checked) {
+                agregarProducto(this);
+            } else {
+                quitarProducto(this);
+            }
+        });
+    });
+
+    container.addEventListener("click", function(e) {
+        const btn = e.target.closest('.btn-remove-item');
+        if (btn) {
+            const prefix = btn.dataset.prefix;
+            const row = document.getElementById(`row-${prefix}`);
+
+            const productoInput = row.querySelector(`input[name="turnoproducto_set-${prefix}-producto"]`);
+            if(productoInput){
+                const checkbox = document.querySelector(`.producto-selector[value="${productoInput.value}"]`);
+                if(checkbox) checkbox.checked = false;
+            }
+
+            marcarParaBorrar(row);
+        }
+    });
+
+    function agregarProducto(checkbox) {
+        const productoId = checkbox.value;
+        const descripcion = checkbox.dataset.descripcion;
+        const stock = checkbox.dataset.stock;
+
+        const index = parseInt(totalFormsInput.value);
+
+        let newRowHtml = templateRow.replace(/__prefix__/g, index);
+        
+        container.insertAdjacentHTML('beforeend', newRowHtml);
+
+        totalFormsInput.value = index + 1;
+
+        const newRow = document.getElementById(`row-${index}`);
+        
+        newRow.querySelector(`input[name="turnoproducto_set-${index}-producto"]`).value = productoId;
+
+        newRow.querySelector('.descripcion-visual').value = descripcion;
+        newRow.querySelector('.stock-visual').innerText = `Stock: ${stock}`;
+
+        checkbox.dataset.formPrefix = index;
+    }
+
+    function quitarProducto(checkbox) {
+        const prefix = checkbox.dataset.formPrefix;
+        if (prefix !== undefined) {
+            const row = document.getElementById(`row-${prefix}`);
+            if (row) {
+                marcarParaBorrar(row);
+            }
+        }
+    }
+
+    function marcarParaBorrar(row) {
+        const deleteInput = row.querySelector('input[name$="-DELETE"]');
+        const idInput = row.querySelector('input[name$="-id"]'); // ID de base de datos
+
+        if (idInput && idInput.value) {
+            // Si el item ya existe en BD, marcamos DELETE y ocultamos
+            deleteInput.checked = true;
+            row.classList.add('d-none');
+        } else {
+            row.remove();
+        }
+    }
 });
+
 </script>
 {% endblock %}

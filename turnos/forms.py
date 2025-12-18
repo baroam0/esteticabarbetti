@@ -1,6 +1,45 @@
 from django import forms
-from .models import Turno
+from django.forms import inlineformset_factory
+from .models import Turno, TurnoProducto
 
+
+class TurnoProductoForm(forms.ModelForm):
+    stock_actual = forms.DecimalField(
+        required=False, 
+        disabled=True, 
+        max_digits=10, 
+        decimal_places=2,
+        label="Stock Actual"
+    )
+
+    class Meta:
+        model = TurnoProducto
+        fields = ['producto', 'cantidad_consumida']
+        widgets = {
+            'producto': forms.HiddenInput(), 
+            'cantidad_consumida': forms.NumberInput(
+                attrs={
+                    'class': 'form-control form-control-sm cantidad-consumida', 
+                    'step': '0.01', 
+                    'min': '0'
+                }
+            ),
+        }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        if self.instance and self.instance.pk:
+            producto = self.instance.producto
+            self.fields['stock_actual'].initial = producto.stock
+
+
+TurnoProductoFormSet = inlineformset_factory(
+    Turno, 
+    TurnoProducto, 
+    form=TurnoProductoForm, 
+    extra=0, # No mostrar forms vacíos por defecto
+    can_delete=True
+)
 
 class TurnoForm(forms.ModelForm):
     class Meta:
@@ -8,8 +47,8 @@ class TurnoForm(forms.ModelForm):
         model = Turno
 
         fields = [
-            'fecha_hora', 'monto', 'modo_pago', 'pagado', 
-            'comprobante', 'cosmetologa', 'tratamientos', 'productos', 'observaciones'
+            'fecha_hora', 'monto', 'modo_pago', 'pagado', 'productos',
+            'comprobante', 'cosmetologa', 'tratamientos', 'observaciones'
         ]        
 
         widgets = {
@@ -40,3 +79,4 @@ class TurnoForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.fields['fecha_hora'].input_formats = ['%Y-%m-%dT%H:%M']
+

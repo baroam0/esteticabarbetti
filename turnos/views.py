@@ -1,6 +1,7 @@
 
 from datetime import datetime
 
+from django.db import transaction
 from django.contrib import messages
 from django.http import JsonResponse
 from django.views.generic import ListView, CreateView, UpdateView
@@ -8,8 +9,8 @@ from django.views import View
 from django.urls import reverse_lazy
 from django.shortcuts import redirect
 
-from .models import Turno
-from .forms import TurnoForm
+from .models import Turno, TurnoProducto
+from .forms import TurnoForm, TurnoProductoFormSet
 
 from cosmiatras.models import Cosmetologa
 from productos.models import HistorialProducto
@@ -23,94 +24,6 @@ class TurnoListView(ListView):
         context = super().get_context_data(**kwargs)
         context['cosmetologas'] = Cosmetologa.objects.all()
         return context
-
-class TurnoCreateView(CreateView):
-    model = Turno
-    form_class = TurnoForm
-    template_name = 'turnos/turno_form.html'
-    success_url = reverse_lazy('turno_list')
-
-    def get_initial(self):
-        initial = super().get_initial()
-        fecha = self.request.GET.get('fecha')
-        if fecha:
-            try:
-                dt = datetime.strptime(fecha, "%Y-%m-%d").replace(hour=9, minute=0)
-                initial['fecha_hora'] = dt.strftime("%Y-%m-%dT%H:%M")
-            except ValueError:
-                pass
-        return initial
-
-    def form_valid(self, form):
-        form.instance.usuario = self.request.user
-        response = super().form_valid(form)
-        
-        productos_seleccionados = form.cleaned_data.get('productos')
-
-        for producto in productos_seleccionados:
-            if producto.stock <= 0:
-                messages.error(self.request, f"El producto {producto.descripcion} no tiene stock disponible.")
-                return redirect("turno_create")  # o donde corresponda
-
-            producto.stock -= 1
-            producto.save()
-
-            HistorialProducto.objects.create(
-                producto=producto,
-                usuario=self.request.user,
-                precio_registrado=producto.precio,
-                stock_registrado=producto.stock,
-                accion="TURNO",
-                observaciones=f"Fecha del turno: {form.instance.fecha_hora.strftime('%d-%m-%Y %H:%M')}"
-            )
-
-        return response
-
-
-class TurnoUpdateView(UpdateView):
-    model = Turno
-    form_class = TurnoForm
-    template_name = 'turnos/turno_form.html'
-    success_url = reverse_lazy('turno_list')
-
-    def form_valid(self, form):
-        form.instance.usuario = self.request.user
-
-        turno_original = Turno.objects.get(pk=self.object.pk)
-        productos_antes = set(turno_original.productos.all())
-        productos_despues = set(form.cleaned_data['productos'])
-
-        productos_quitados = productos_antes - productos_despues
-        productos_agregados = productos_despues - productos_antes
-
-        for producto in productos_agregados:
-            if producto.stock <= 0:
-                messages.error(
-                    self.request,
-                    f"El producto {producto.descripcion} no tiene stock disponible."
-                )
-                return self.form_invalid(form)
-
-        response = super().form_valid(form)
-
-        for producto in productos_quitados:
-            producto.stock += 1
-            producto.save()
-
-        for producto in productos_agregados:
-            producto.stock -= 1
-            producto.save()
-        
-        HistorialProducto.objects.create(
-            producto=producto,
-            usuario=self.request.user,
-            precio_registrado=producto.precio,
-            stock_registrado=producto.stock,
-            accion="TURNO",
-            observaciones=f"Fecha del turno: {form.instance.fecha_hora.strftime('%d-%m-%Y %H:%M')}"
-        )
-
-        return response
 
 
 class TurnoEventsView(View):
@@ -132,5 +45,161 @@ class TurnoEventsView(View):
             })
 
         return JsonResponse(eventos, safe=False)
+
+
+class TurnoCreateView(CreateView):
+    model = Turno
+    form_class = TurnoForm
+    template_name = 'turnos/turno_form.html'
+    success_url = reverse_lazy('turno_list')
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        
+        if self.request.POST:
+            context['formset'] = TurnoProductoFormSet(self.request.POST, instance=self.object)
+        else:
+            context['formset'] = TurnoProductoFormSet(instance=self.object)
+
+        if self.object and self.object.pk:
+             context['productos_seleccionados_en_turno'] = self.object.productos.all()
+
+        return context
+    
+    def form_valid(self, form):
+
+        with transaction.atomic():
+
+            form.instance.usuario = self.request.user
+            self.object = form.save()
+
+            context = self.get_context_data()
+            formset = context['formset']
+
+            if formset.is_valid():
+                formset.instance = self.object
+                turno_productos = formset.save(commit=False)
+                productos_actualizados = []
+
+                for tp_instance in turno_productos:
+                    producto = tp_instance.producto
+                    cantidad = tp_instance.cantidad_consumida
+                    
+                    if producto.stock < cantidad:
+                        messages.error(self.request, f"Stock insuficiente: {producto.descripcion}. Disponible: {producto.stock}, Requerido: {cantidad}")
+                        return self.form_invalid(form) 
+
+                    producto.stock -= cantidad
+                    producto.save()
+                    productos_actualizados.append(producto) # Lo agregamos para el historial
+
+                    tp_instance.save()
+                
+                
+                for producto in productos_actualizados:
+                    HistorialProducto.objects.create(
+                        producto=producto,
+                        usuario=self.request.user,
+                        precio_registrado=producto.precio,
+                        stock_registrado=producto.stock, # Stock después del consumo
+                        accion="TURNO",
+                        observaciones=f"Consumo fraccionado. Fecha del turno: {self.object.fecha_hora.strftime('%d-%m-%Y %H:%M')}"
+                    )
+
+            else:
+                return self.form_invalid(form)
+
+        return redirect(self.success_url)
+
+
+class TurnoUpdateView(UpdateView):
+    model = Turno
+    form_class = TurnoForm
+    template_name = 'turnos/turno_form.html'
+    success_url = reverse_lazy('turno_list')
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        if self.request.POST:
+            context['formset'] = TurnoProductoFormSet(self.request.POST, instance=self.object)
+        else:
+            context['formset'] = TurnoProductoFormSet(instance=self.object)
+
+        context['productos_seleccionados_en_turno'] = self.object.productos.all()
+        
+        return context
+
+    def form_valid(self, form):        
+        context = self.get_context_data()
+        formset = context['formset']
+        
+        if not formset.is_valid():
+            return self.form_invalid(form)
+            
+        
+        with transaction.atomic():
+            productos_antes = {}
+            for tp in TurnoProducto.objects.filter(turno=self.object):
+                productos_antes[tp.producto_id] = tp.cantidad_consumida
+            
+            form.instance.usuario = self.request.user
+            self.object = form.save()
+
+            formset.instance = self.object
+            new_tp_instances = formset.save(commit=False)
+            
+            for tp_instance in formset.deleted_objects:
+                producto = tp_instance.producto
+                cantidad = tp_instance.cantidad_consumida
+                
+                producto.stock += cantidad
+                producto.save()
+                
+                HistorialProducto.objects.create(
+                    producto=producto,
+                    usuario=self.request.user,
+                    precio_registrado=producto.precio,
+                    stock_registrado=producto.stock,
+                    accion="EDITADO", # O 'REPOSICION'
+                    observaciones=f"Reposición por eliminación de producto en Turno {self.object.id}"
+                )
+
+                tp_instance.delete()
+
+            for tp_instance in new_tp_instances:
+                producto = tp_instance.producto
+                nueva_cantidad = tp_instance.cantidad_consumida
+
+                cantidad_anterior = productos_antes.get(producto.id, 0)
+                
+                diferencia = nueva_cantidad - cantidad_anterior
+                
+                if diferencia > 0:
+                    # Se está consumiendo más: verificar stock y descontar
+                    if producto.stock < diferencia:
+                        messages.error(self.request, f"Stock insuficiente para ajustar {producto.descripcion}. Disponible: {producto.stock}, Adicional requerido: {diferencia}")
+                        return self.form_invalid(form)
+                    
+                    producto.stock -= diferencia
+                    
+                elif diferencia < 0:
+                    # Se consumió menos: reponer
+                    producto.stock += abs(diferencia)
+                
+                # Guardar producto y TurnoProducto
+                producto.save()
+                tp_instance.save()
+                
+                if diferencia != 0:
+                    HistorialProducto.objects.create(
+                        producto=producto,
+                        usuario=self.request.user,
+                        precio_registrado=producto.precio,
+                        stock_registrado=producto.stock,
+                        accion="TURNO_AJUSTE", 
+                        observaciones=f"Ajuste por edición de Turno. Diferencia: {diferencia}. Stock final: {producto.stock}"
+                    )
+                
+            return redirect(self.success_url)
 
 # Create your views here.

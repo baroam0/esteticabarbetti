@@ -21,7 +21,7 @@ class Turno(models.Model):
     monto = models.DecimalField(max_digits=15, decimal_places=2, null=True, blank=True)
     cosmetologa = models.ForeignKey(Cosmetologa, on_delete=models.CASCADE, related_name='turnos')
     tratamientos = models.ManyToManyField(Tratamiento, related_name='turnos')
-    productos = models.ManyToManyField(Producto, related_name='consumos', blank=True)
+    productos = models.ManyToManyField(Producto, related_name='consumos', blank=True)   
     usuario = models.ForeignKey(User, on_delete=models.CASCADE, related_name='turnos')
     fecha_modificacion = models.DateTimeField(auto_now=True)
     observaciones = models.CharField(max_length=500, null=True, blank=True)
@@ -33,5 +33,21 @@ class Turno(models.Model):
     class Meta:
         verbose_name_plural = "Turnos"
 
+
+class TurnoProducto(models.Model):
+    turno = models.ForeignKey(Turno, on_delete=models.CASCADE)
+    producto = models.ForeignKey(Producto, on_delete=models.CASCADE)
+    cantidad_consumida = models.DecimalField(
+        max_digits=10, 
+        decimal_places=2, 
+        default=1.0, 
+        verbose_name="Cantidad Consumida"
+    )
+
+    class Meta:
+        unique_together = ('turno', 'producto')
+
+    def __str__(self):
+        return f"{self.cantidad_consumida} de {self.producto.descripcion} en Turno {self.turno.id}"
 
 # Create your models here.
