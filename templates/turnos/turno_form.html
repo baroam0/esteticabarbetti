@@ -110,8 +110,7 @@
                                                 </div>
                                                 <label class="form-control bg-white" for="chk_prod_{{ p.id }}" style="font-size: 0.85rem;">
                                                     {{ p.descripcion }} <span class="badge badge-info float-right">${{ p.precio }}</span>
-                                                    <br><!--small class="text-muted">Stock: {{ p.stock }}</small-->
-                                                </label>
+                                                    <br></label>
                                             </div>
                                         </div>
                                     {% endfor %}
@@ -223,12 +222,55 @@ function Volver() {
     window.location.replace("/turnos/lista");
 }
 
+function calcularMontoTotal() {
+    const montoInput = document.getElementById('id_monto');
+    let montoActual = parseFloat(montoInput.value) || 0;
+    
+    // Obtener el valor actual de 'Monto' solo si no está vacío o es 0, 
+    // y si no es la primera carga (para no sobrescribir un monto manual).
+    // Si el campo tiene un valor inicial (ej. edición), se debe recalcular, 
+    // pero si el usuario lo modificó manualmente, idealmente no debería ser modificado, 
+    // aunque la lógica de sumar/restar tratamientos sugiere que sí debería reflejar los tratamientos.
 
+    // Para evitar problemas de precisión en JS, multiplicamos por 100
+    let totalTratamientos = 0; 
+
+    document.querySelectorAll('.tratamiento-checkbox').forEach(checkbox => {
+        if (checkbox.checked) {
+            const precio = parseFloat(checkbox.dataset.precio) || 0;
+            totalTratamientos += precio; 
+        }
+    });
+
+    // Asignar el nuevo valor al campo Monto
+    // NOTA: Esta lógica asume que el campo 'monto' SIEMPRE reflejará la suma de los tratamientos seleccionados.
+    // Si necesitas que el campo 'monto' tenga un valor base o sea manual además de los tratamientos, 
+    // la lógica debe ser más compleja. Por simplicidad, solo sumamos los tratamientos.
+    montoInput.value = totalTratamientos.toFixed(2); 
+}
 
 document.addEventListener("DOMContentLoaded", function () {
     const totalFormsInput = document.getElementById("id_turnoproducto_set-TOTAL_FORMS");
     const container = document.getElementById("formset-container");
     const templateRow = document.getElementById("empty-form-template").innerHTML;
+    const tratamientoCheckboxes = document.querySelectorAll('.tratamiento-checkbox');
+
+
+    // 1. Lógica para los tratamientos (Nuevo)
+    // Agrega el listener a todos los checkboxes de tratamientos
+    tratamientoCheckboxes.forEach(checkbox => {
+        checkbox.addEventListener('change', calcularMontoTotal);
+    });
+
+    // Llama a calcularMontoTotal al cargar la página para reflejar los tratamientos chequeados
+    // si se está editando un turno.
+    // **Nota importante:** Si el campo `monto` ya tiene un valor inicial desde la base de datos, 
+    // se sobrescribirá con la suma de los tratamientos. Si deseas mantener el valor original 
+    // y SÓLO SUMAR/RESTAR la diferencia de los tratamientos chequeados/deschequeados, 
+    // la lógica sería más compleja, pero para este caso simple, recalculamos el total.
+    calcularMontoTotal(); 
+
+    // 2. Lógica para el Formset de Productos (Existente)
 
     document.querySelectorAll(".formset-item").forEach(row => {
         const productoInput = row.querySelector('input[name$="-producto"]');
@@ -268,7 +310,6 @@ document.addEventListener("DOMContentLoaded", function () {
                 const checkbox = document.querySelector(`.producto-selector[value="${productoInput.value}"]`);
                 if(checkbox) checkbox.checked = false;
             }
-
             marcarParaBorrar(row);
         }
     });
@@ -277,17 +318,11 @@ document.addEventListener("DOMContentLoaded", function () {
         const productoId = checkbox.value;
         const descripcion = checkbox.dataset.descripcion;
         const stock = checkbox.dataset.stock;
-
         const index = parseInt(totalFormsInput.value);
-
         let newRowHtml = templateRow.replace(/__prefix__/g, index);
-        
         container.insertAdjacentHTML('beforeend', newRowHtml);
-
         totalFormsInput.value = index + 1;
-
         const newRow = document.getElementById(`row-${index}`);
-        
         newRow.querySelector(`input[name="turnoproducto_set-${index}-producto"]`).value = productoId;
 
         newRow.querySelector('.descripcion-visual').value = descripcion;

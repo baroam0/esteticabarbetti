@@ -1,5 +1,6 @@
 
 from datetime import datetime
+from decimal import Decimal
 
 from django.db import transaction
 from django.contrib import messages
@@ -57,57 +58,51 @@ class TurnoCreateView(CreateView):
         context = super().get_context_data(**kwargs)
         
         if self.request.POST:
-            context['formset'] = TurnoProductoFormSet(self.request.POST, instance=self.object)
+            context['formset'] = TurnoProductoFormSet(self.request.POST) 
         else:
-            context['formset'] = TurnoProductoFormSet(instance=self.object)
-
-        if self.object and self.object.pk:
-             context['productos_seleccionados_en_turno'] = self.object.productos.all()
+            context['formset'] = TurnoProductoFormSet()
 
         return context
     
     def form_valid(self, form):
+        context = self.get_context_data()
+        formset = context['formset']
+
+        if not formset.is_valid():
+            return self.form_invalid(form) 
 
         with transaction.atomic():
-
+            
             form.instance.usuario = self.request.user
-            self.object = form.save()
+            self.object = form.save() # self.object ya tiene PK
 
-            context = self.get_context_data()
-            formset = context['formset']
+            formset.instance = self.object
+            turno_productos = formset.save(commit=False)
+            productos_a_loguear = []
 
-            if formset.is_valid():
-                formset.instance = self.object
-                turno_productos = formset.save(commit=False)
-                productos_actualizados = []
-
-                for tp_instance in turno_productos:
-                    producto = tp_instance.producto
-                    cantidad = tp_instance.cantidad_consumida
-                    
-                    if producto.stock < cantidad:
-                        messages.error(self.request, f"Stock insuficiente: {producto.descripcion}. Disponible: {producto.stock}, Requerido: {cantidad}")
-                        return self.form_invalid(form) 
-
-                    producto.stock -= cantidad
-                    producto.save()
-                    productos_actualizados.append(producto) # Lo agregamos para el historial
-
-                    tp_instance.save()
+            for tp_instance in turno_productos:
+                producto = tp_instance.producto
+                cantidad = tp_instance.cantidad_consumida or Decimal(0)
                 
-                
-                for producto in productos_actualizados:
-                    HistorialProducto.objects.create(
-                        producto=producto,
-                        usuario=self.request.user,
-                        precio_registrado=producto.precio,
-                        stock_registrado=producto.stock, # Stock después del consumo
-                        accion="TURNO",
-                        observaciones=f"Consumo fraccionado. Fecha del turno: {self.object.fecha_hora.strftime('%d-%m-%Y %H:%M')}"
-                    )
+                if producto.stock < cantidad:
+                    messages.error(self.request, f"Stock insuficiente: {producto.descripcion}. Disponible: {producto.stock}, Requerido: {cantidad}")
+                    return self.form_invalid(form) 
 
-            else:
-                return self.form_invalid(form)
+                producto.stock -= cantidad
+                producto.save()
+                
+                productos_a_loguear.append(producto)
+                tp_instance.save()
+
+            for producto in productos_a_loguear:
+                HistorialProducto.objects.create(
+                    producto=producto,
+                    usuario=self.request.user,
+                    precio_registrado=producto.precio,
+                    stock_registrado=producto.stock, # Stock DESPUÉS del consumo
+                    accion="TURNO",
+                    observaciones=f"Consumo fraccionado. Fecha del turno: {self.object.fecha_hora.strftime('%d-%m-%Y %H:%M')}"
+                )
 
         return redirect(self.success_url)
 
@@ -140,18 +135,18 @@ class TurnoUpdateView(UpdateView):
         with transaction.atomic():
             productos_antes = {}
             for tp in TurnoProducto.objects.filter(turno=self.object):
-                productos_antes[tp.producto_id] = tp.cantidad_consumida
+                productos_antes[tp.producto_id] = tp.cantidad_consumida or Decimal(0)
             
             form.instance.usuario = self.request.user
             self.object = form.save()
 
             formset.instance = self.object
             new_tp_instances = formset.save(commit=False)
-            
+
             for tp_instance in formset.deleted_objects:
                 producto = tp_instance.producto
-                cantidad = tp_instance.cantidad_consumida
-                
+                cantidad = tp_instance.cantidad_consumida or Decimal(0)
+
                 producto.stock += cantidad
                 producto.save()
                 
@@ -160,7 +155,7 @@ class TurnoUpdateView(UpdateView):
                     usuario=self.request.user,
                     precio_registrado=producto.precio,
                     stock_registrado=producto.stock,
-                    accion="EDITADO", # O 'REPOSICION'
+                    accion="EDITADO", 
                     observaciones=f"Reposición por eliminación de producto en Turno {self.object.id}"
                 )
 
@@ -168,37 +163,40 @@ class TurnoUpdateView(UpdateView):
 
             for tp_instance in new_tp_instances:
                 producto = tp_instance.producto
-                nueva_cantidad = tp_instance.cantidad_consumida
 
-                cantidad_anterior = productos_antes.get(producto.id, 0)
+                nueva_cantidad = tp_instance.cantidad_consumida or Decimal(0)
+
+                cantidad_anterior = productos_antes.get(producto.id, Decimal(0))
                 
                 diferencia = nueva_cantidad - cantidad_anterior
                 
-                if diferencia > 0:
-                    # Se está consumiendo más: verificar stock y descontar
+                if diferencia > Decimal(0):
                     if producto.stock < diferencia:
                         messages.error(self.request, f"Stock insuficiente para ajustar {producto.descripcion}. Disponible: {producto.stock}, Adicional requerido: {diferencia}")
                         return self.form_invalid(form)
                     
                     producto.stock -= diferencia
+                    accion_historial = "TURNO" # Consumo
                     
-                elif diferencia < 0:
-                    # Se consumió menos: reponer
+                elif diferencia < Decimal(0):
                     producto.stock += abs(diferencia)
-                
-                # Guardar producto y TurnoProducto
+                    accion_historial = "EDITADO"
+                else:
+                    tp_instance.save()
+                    continue
+
                 producto.save()
                 tp_instance.save()
                 
-                if diferencia != 0:
-                    HistorialProducto.objects.create(
-                        producto=producto,
-                        usuario=self.request.user,
-                        precio_registrado=producto.precio,
-                        stock_registrado=producto.stock,
-                        accion="TURNO_AJUSTE", 
-                        observaciones=f"Ajuste por edición de Turno. Diferencia: {diferencia}. Stock final: {producto.stock}"
-                    )
+                HistorialProducto.objects.create(
+                    producto=producto,
+                    usuario=self.request.user,
+                    precio_registrado=producto.precio,
+                    stock_registrado=producto.stock,
+                    accion=accion_historial, # Usamos la acción definida
+                    #observaciones=f"Ajuste por edición de Turno. Diferencia: {diferencia}. Stock final: {producto.stock}"
+                    observaciones=f"Ajuste por edición de Turno. Fecha del turno: {self.object.fecha_hora.strftime('%d-%m-%Y %H:%M')}"
+                )
                 
             return redirect(self.success_url)
 

@@ -25,7 +25,7 @@ class HistorialProducto(models.Model):
     fecha_modificacion = models.DateTimeField(auto_now_add=True)
 
     precio_registrado = models.DecimalField(max_digits=20, decimal_places=2)
-    stock_registrado = models.IntegerField()
+    stock_registrado = models.DecimalField(max_digits=20, decimal_places=2)
 
     accion = models.CharField(max_length=20, choices=[('CREADO', 'Creado'), ('EDITADO', 'Editado'), ('TURNO', 'Turno')])
     observaciones = models.CharField(max_length=500, null=True, blank=True)
