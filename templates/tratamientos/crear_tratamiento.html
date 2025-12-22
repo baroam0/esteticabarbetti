@@ -12,6 +12,15 @@
                             <div class="text-center">
                                 <h1 class="h4 text-gray-900 mb-4">{{accion}} Tratamiento</h1>
                             </div>
+                            
+                            {% if messages %}
+                                <div class="alert alert-warning">
+                                {% for message in messages %}
+                                    {{ message }}
+                                {% endfor %}
+                                </div>
+                            {% endif %}
+
                             <form method="POST"> {% csrf_token %}
                                 <div class="form-group row">
                                     <div class="col-sm-12 mb-3 mb-sm-0">

@@ -1,4 +1,5 @@
 
+from django.db import IntegrityError
 from django.contrib.auth import update_session_auth_hash
 from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
@@ -65,10 +66,14 @@ def crear_tratamiento(request):
     if request.method == 'POST':
         form = TratamientoForm(request.POST)
         if form.is_valid():
-            tratamiento = form.save(commit=False)
-            tratamiento.usuario = request.user 
-            tratamiento.save()
-            return redirect('listar_tratamientos')
+            try:
+                tratamiento = form.save(commit=False)
+                tratamiento.usuario = request.user 
+                tratamiento.save()
+                return redirect('listar_tratamientos')
+            except IntegrityError:
+                messages.warning(request, "Ya existe un tratamiento con esa descripcion")
+
     else:
         form = TratamientoForm()
     return render(request, 'tratamientos/crear_tratamiento.html', {'form': form, 'accion': 'Crear'})
@@ -80,8 +85,13 @@ def editar_tratamiento(request, pk):
     if request.method == 'POST':
         form = TratamientoForm(request.POST, instance=tratamiento)
         if form.is_valid():
-            form.save()
-            return redirect('listar_tratamientos')
+            try:
+                tratamiento = form.save(commit=False)
+                tratamiento.usuario = request.user 
+                tratamiento.save()
+                return redirect('listar_tratamientos')
+            except IntegrityError:
+                messages.warning(request, "Ya existe un tratamiento con esa descripcion")
     else:
         form = TratamientoForm(instance=tratamiento)
     return render(request, 'tratamientos/crear_tratamiento.html', {'form': form, 'accion': 'Editar'})

@@ -1,4 +1,5 @@
 
+from django.db import IntegrityError
 from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
@@ -68,19 +69,21 @@ def crear_producto(request):
     if request.method == 'POST':
         form = ProductoForm(request.POST)
         if form.is_valid():
-            producto = form.save(commit=False)
-            producto.usuario = request.user 
-            producto.save()
 
-            HistorialProducto.objects.create(
-                producto=producto,
-                usuario=request.user,
-                precio_registrado=producto.precio,
-                stock_registrado=producto.stock,
-                accion='CREADO'
-            )
-
-            return redirect('listar_productos')
+            try:
+                producto = form.save(commit=False)
+                producto.usuario = request.user 
+                producto.save()
+                HistorialProducto.objects.create(
+                    producto=producto,
+                    usuario=request.user,
+                    precio_registrado=producto.precio,
+                    stock_registrado=producto.stock,
+                    accion='CREADO'
+                )
+                return redirect('listar_productos')
+            except IntegrityError:
+                messages.warning(request, "Ya existe un producto con esa descripcion")
     else:
         form = ProductoForm()
     return render(request, 'productos/crear_producto.html', {'form': form, 'accion': 'Crear'})
@@ -92,16 +95,21 @@ def editar_producto(request, pk):
     if request.method == 'POST':
         form = ProductoForm(request.POST, instance=producto)
         if form.is_valid():
-            producto_modificado = form.save()
+            try:
+                producto_modificado = form.save(commit=False)
+                producto.usuario=request.user
+                producto.save()
+                HistorialProducto.objects.create(
+                    producto=producto_modificado,
+                    usuario=request.user,
+                    precio_registrado=producto_modificado.precio,
+                    stock_registrado=producto_modificado.stock,
+                    accion='EDITADO'
+                )
+                return redirect('listar_productos')
+            except IntegrityError:
+                messages.warning(request, "Ya existe un producto con esa descripcion")
 
-            HistorialProducto.objects.create(
-                producto=producto_modificado,
-                usuario=request.user,
-                precio_registrado=producto_modificado.precio,
-                stock_registrado=producto_modificado.stock,
-                accion='EDITADO'
-            )
-            return redirect('listar_productos')
     else:
         form = ProductoForm(instance=producto)
     return render(request, 'productos/crear_producto.html', {'form': form, 'accion': 'Editar'})
