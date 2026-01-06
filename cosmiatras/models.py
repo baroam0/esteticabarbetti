@@ -20,7 +20,7 @@ class Cosmetologa(models.Model):
     telefono = models.CharField(max_length=15, blank=True, null=True)
 
     def __str__(self):
-        return self.apellido + ', ' + self.nombre
+        return self.apellido.upper() + ', ' + self.nombre.upper()
 
     class Meta:
         verbose_name_plural = "Cosmetologa"

@@ -40,7 +40,7 @@ class TurnoEventsView(View):
         for turno in turnos:
             eventos.append({
                 "id": turno.id,
-                "title": f"{turno.cosmetologa.nombre} - {', '.join([t.descripcion for t in turno.tratamientos.all()])}",
+                "title": f"{turno.nombrepaciente.upper()}  - {', '.join([t.descripcion for t in turno.tratamientos.all()])}",
                 "start": turno.fecha_hora.isoformat(),
                 "url": f"/turnos/editar/{turno.id}"
             })

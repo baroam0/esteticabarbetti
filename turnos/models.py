@@ -26,6 +26,19 @@ class Turno(models.Model):
     fecha_modificacion = models.DateTimeField(auto_now=True)
     observaciones = models.CharField(max_length=500, null=True, blank=True)
     pagado = models.BooleanField(default=False)
+    nombrepaciente = models.CharField(max_length=100, null=True, blank=True)
+    numerodocumento=models.CharField(null=True, blank=True, max_length=20)
+
+    SEXO_CHOICES = (
+        ('M', 'Masculino'),
+        ('F', 'Femenino'),
+        ('I', 'Indefinido'),
+    )
+    sexo = models.CharField(
+        max_length=1,
+        choices=SEXO_CHOICES,
+        default='M'
+    )
 
     def __str__(self):
         return f"{self.cosmetologa} - {self.fecha_hora.strftime('%d/%m/%Y %H:%M')}"

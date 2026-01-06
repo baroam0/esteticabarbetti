@@ -7,17 +7,59 @@ from pacientes.models import Paciente
 from .forms import HistoriaClinicaForm, ImagenMultipleForm
 from .models import HistoriaClinica, ImagenHistoriaClinica
 
+from turnos.models import Turno, TurnoProducto
 
+
+"""
 @login_required
 def listar_historiasclinicas(request, pk):
     paciente = Paciente.objects.get(pk=pk)
     historiasclinicas = HistoriaClinica.objects.filter(paciente=paciente).order_by('-fecha')
+    turnos = Turno.objects.filter(
+        sexo=paciente.sexo, numerodocumento=paciente.numerodocumento
+    ).order_by('-fecha_hora')
+
     return render(
         request, 
         'historiasclinicas/lista_historiaclinica.html', 
         {
             'historiasclinicas': historiasclinicas,
-            'paciente': paciente
+            'paciente': paciente,
+            'turnos': turnos
+        }
+    )
+"""
+
+@login_required
+def listar_historiasclinicas(request, pk): 
+    paciente = Paciente.objects.get(pk=pk) 
+    historiasclinicas = HistoriaClinica.objects.filter(
+        paciente=paciente).order_by('-fecha') 
+    
+    turnos = Turno.objects.filter(
+        sexo=paciente.sexo, numerodocumento=paciente.numerodocumento
+    ).order_by('-fecha_hora') 
+    
+    lista_turnos = [] 
+    for turno in turnos: 
+        productos = TurnoProducto.objects.filter(turno=turno)
+        
+        lista_turnos.append(
+            {
+                "cosmiatra": turno.cosmetologa,
+                "fecha_hora": turno.fecha_hora, 
+                "tratamiento": ", ".join([t.descripcion for t in turno.tratamientos.all()]),
+                "producto": ", ".join([p.producto.descripcion for p in productos]),
+            }
+        ) 
+
+    return render(
+        request, 
+        'historiasclinicas/lista_historiaclinica.html', 
+        {
+            'historiasclinicas': historiasclinicas,
+            'paciente': paciente,
+            'turnos': lista_turnos
         }
     )
 

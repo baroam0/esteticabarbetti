@@ -48,7 +48,8 @@ class TurnoForm(forms.ModelForm):
 
         fields = [
             'fecha_hora', 'monto', 'modo_pago', 'pagado', 'productos',
-            'comprobante', 'cosmetologa', 'tratamientos', 'observaciones'
+            'comprobante', 'cosmetologa', 'tratamientos', 'observaciones', 
+            'nombrepaciente', 'numerodocumento', 'sexo'
         ]        
 
         widgets = {
@@ -73,10 +74,14 @@ class TurnoForm(forms.ModelForm):
             'tratamientos': forms.CheckboxSelectMultiple(),
             'productos': forms.CheckboxSelectMultiple(),
             'observaciones': forms.Textarea(attrs={'class': 'form-control', 'rows': 2 }),
+            'nombrepaciente': forms.TextInput(attrs={'class': 'form-control' }),
+            'numerodocumento': forms.TextInput(attrs={'class': 'form-control' }),
+            'sexo': forms.Select(attrs={'class': 'form-control'}),
         }
 
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.fields['fecha_hora'].input_formats = ['%Y-%m-%dT%H:%M']
+        self.fields['numerodocumento'].required = True
 

@@ -240,6 +240,15 @@ function Volver() {
 
 function calcularMontoTotal() {
     const montoInput = document.getElementById('id_monto');
+    let montoActual = parseFloat(montoInput.value) || 0;
+    
+    // Obtener el valor actual de 'Monto' solo si no está vacío o es 0, 
+    // y si no es la primera carga (para no sobrescribir un monto manual).
+    // Si el campo tiene un valor inicial (ej. edición), se debe recalcular, 
+    // pero si el usuario lo modificó manualmente, idealmente no debería ser modificado, 
+    // aunque la lógica de sumar/restar tratamientos sugiere que sí debería reflejar los tratamientos.
+
+    // Para evitar problemas de precisión en JS, multiplicamos por 100
     let totalTratamientos = 0; 
 
     document.querySelectorAll('.tratamiento-checkbox').forEach(checkbox => {
@@ -249,173 +258,53 @@ function calcularMontoTotal() {
         }
     });
 
-    // Asignar el nuevo valor, sobrescribiendo el valor anterior con la suma de los tratamientos.
+    // Asignar el nuevo valor al campo Monto
+    // NOTA: Esta lógica asume que el campo 'monto' SIEMPRE reflejará la suma de los tratamientos seleccionados.
+    // Si necesitas que el campo 'monto' tenga un valor base o sea manual además de los tratamientos, 
+    // la lógica debe ser más compleja. Por simplicidad, solo sumamos los tratamientos.
     montoInput.value = totalTratamientos.toFixed(2); 
 }
-
-
-// =========================================================
-// LÓGICA DEL FORMSET DE PRODUCTOS
-// =========================================================
-
-// Función para reindexar los prefijos de los campos después de una eliminación
-function updateFormIndices() {
-    const container = document.getElementById("formset-container");
-    const totalFormsInput = document.getElementById("id_turnoproducto_set-TOTAL_FORMS");
-    let newIndex = 0;
-    
-    // Iterar sobre todos los elementos visibles (no marcados para DELETE)
-    // También incluimos los .d-none aquí para no romper el índice si se reindexa
-    // sobre una fila oculta que ya estaba en BD.
-    
-    // Mejorar la selección para solo considerar las filas presentes en el DOM que no están eliminadas lógicamente
-    container.querySelectorAll('.formset-item:not([style*="display: none"]):not(.d-none)').forEach(row => {
-        
-        // El prefijo original se extrae del ID de la fila
-        const oldPrefixMatch = row.id.match(/row-(\d+)/);
-        if (!oldPrefixMatch) return; // Saltar si el ID no tiene el formato esperado
-
-        const oldPrefix = oldPrefixMatch[1];
-        const newPrefix = newIndex;
-
-        // 1. Actualizar el atributo 'id' de la fila
-        row.id = `row-${newPrefix}`;
-
-        // 2. Iterar sobre todos los elementos internos de la fila
-        row.querySelectorAll('[name]').forEach(input => {
-            // Reemplazar el prefijo en el nombre y el ID
-            const name = input.name.replace(`turnoproducto_set-${oldPrefix}`, `turnoproducto_set-${newPrefix}`);
-            const id = input.id.replace(`id_turnoproducto_set-${oldPrefix}`, `id_turnoproducto_set-${newPrefix}`);
-            
-            input.name = name;
-            input.id = id;
-        });
-
-        // 3. Actualizar data-prefix en el botón de eliminar
-        const removeButton = row.querySelector('.btn-remove-item');
-        if (removeButton) {
-            removeButton.dataset.prefix = newPrefix;
-        }
-
-        // 4. Actualizar el dataset.formPrefix en el checkbox selector de productos
-        const productoInput = row.querySelector(`input[name="turnoproducto_set-${newPrefix}-producto"]`);
-        if(productoInput && productoInput.value) {
-            const checkbox = document.querySelector(`.producto-selector[value="${productoInput.value}"]`);
-            if (checkbox) {
-                checkbox.dataset.formPrefix = newPrefix;
-            }
-        }
-
-        newIndex++;
-    });
-
-    // 5. Actualizar TOTAL_FORMS al nuevo total de filas (visibles o lógicamente eliminadas)
-    // El total debe ser el número de filas en el DOM.
-    totalFormsInput.value = newIndex;
-}
-
-
-function marcarParaBorrar(row) {
-    const deleteInput = row.querySelector('input[name$="-DELETE"]');
-    const idInput = row.querySelector('input[name$="-id"]'); // ID de base de datos
-
-    // Obtener el checkbox del producto asociado
-    const productoInput = row.querySelector('input[name$="-producto"]');
-    if(productoInput){
-        const checkbox = document.querySelector(`.producto-selector[value="${productoInput.value}"]`);
-        if(checkbox) checkbox.checked = false;
-    }
-    
-    if (idInput && idInput.value) {
-        // Caso 1: Item ya existe en BD (edición). Marcamos DELETE y ocultamos.
-        deleteInput.checked = true;
-        row.classList.add('d-none');
-        // No removemos, lo dejamos para que Django lo borre de la BD.
-    } else {
-        // Caso 2: Item NUEVO. Lo removemos del DOM para que no se envíe.
-        row.remove();
-        // Llamamos a la reindexación para que TOTAL_FORMS sea correcto.
-        updateFormIndices();
-    }
-}
-
-
-function agregarProducto(checkbox) {
-    const totalFormsInput = document.getElementById("id_turnoproducto_set-TOTAL_FORMS");
-    const container = document.getElementById("formset-container");
-    const templateRow = document.getElementById("empty-form-template").innerHTML;
-    
-    const productoId = checkbox.value;
-    const descripcion = checkbox.dataset.descripcion;
-    const stock = checkbox.dataset.stock;
-    const index = parseInt(totalFormsInput.value);
-    
-    let newRowHtml = templateRow.replace(/__prefix__/g, index);
-    container.insertAdjacentHTML('beforeend', newRowHtml);
-
-    // Obtener la nueva fila agregada
-    const newRow = document.getElementById(`row-${index}`);
-    
-    // Llenar datos ocultos y visuales
-    newRow.querySelector(`input[name="turnoproducto_set-${index}-producto"]`).value = productoId;
-    newRow.querySelector('.descripcion-visual').value = descripcion;
-    newRow.querySelector('.stock-visual').innerText = `Stock: ${stock}`;
-    
-    // Vincular el checkbox con el nuevo prefijo
-    checkbox.dataset.formPrefix = index;
-
-    // Actualizar el total de formularios para la próxima adición
-    totalFormsInput.value = index + 1;
-}
-
-function quitarProducto(checkbox) {
-    const prefix = checkbox.dataset.formPrefix;
-    if (prefix !== undefined) {
-        const row = document.getElementById(`row-${prefix}`);
-        if (row) {
-            marcarParaBorrar(row);
-        }
-    }
-}
-
-
-// =========================================================
-// INICIALIZACIÓN
-// =========================================================
 
 document.addEventListener("DOMContentLoaded", function () {
     const totalFormsInput = document.getElementById("id_turnoproducto_set-TOTAL_FORMS");
     const container = document.getElementById("formset-container");
+    const templateRow = document.getElementById("empty-form-template").innerHTML;
     const tratamientoCheckboxes = document.querySelectorAll('.tratamiento-checkbox');
 
-    // 1. Inicialización de Tratamientos y Monto
+
+    // 1. Lógica para los tratamientos (Nuevo)
+    // Agrega el listener a todos los checkboxes de tratamientos
     tratamientoCheckboxes.forEach(checkbox => {
         checkbox.addEventListener('change', calcularMontoTotal);
     });
+
+    // Llama a calcularMontoTotal al cargar la página para reflejar los tratamientos chequeados
+    // si se está editando un turno.
+    // **Nota importante:** Si el campo `monto` ya tiene un valor inicial desde la base de datos, 
+    // se sobrescribirá con la suma de los tratamientos. Si deseas mantener el valor original 
+    // y SÓLO SUMAR/RESTAR la diferencia de los tratamientos chequeados/deschequeados, 
+    // la lógica sería más compleja, pero para este caso simple, recalculamos el total.
     calcularMontoTotal(); 
 
-    // 2. Inicialización del Formset de Productos Existentes
+    // 2. Lógica para el Formset de Productos (Existente)
+
     document.querySelectorAll(".formset-item").forEach(row => {
         const productoInput = row.querySelector('input[name$="-producto"]');
         const deleteInput = row.querySelector('input[name$="-DELETE"]');
         
         if (productoInput && productoInput.value) {
             if (!deleteInput.checked) {
-                // Si la fila existe y NO está marcada para borrarse, vincular el checkbox
                 const checkbox = document.querySelector(`.producto-selector[value="${productoInput.value}"]`);
                 if (checkbox) {
                     checkbox.checked = true;
-                    // Guardar el prefijo del formset en el dataset del checkbox
                     checkbox.dataset.formPrefix = row.id.replace('row-', ''); 
                 }
             } else {
-                // Si la fila existe y SÍ está marcada para borrarse (pudo ser guardada y luego borrada en la misma sesión), ocultarla.
                 row.classList.add('d-none');
             }
         }
     });
 
-    // 3. Listener para Checkboxes de Producto
     document.querySelectorAll(".producto-selector").forEach(cb => {
         cb.addEventListener("change", function() {
             if (this.checked) {
@@ -426,18 +315,61 @@ document.addEventListener("DOMContentLoaded", function () {
         });
     });
 
-    // 4. Listener para Botones de Remover del Formset
     container.addEventListener("click", function(e) {
         const btn = e.target.closest('.btn-remove-item');
         if (btn) {
             const prefix = btn.dataset.prefix;
             const row = document.getElementById(`row-${prefix}`);
+
+            const productoInput = row.querySelector(`input[name="turnoproducto_set-${prefix}-producto"]`);
+            if(productoInput){
+                const checkbox = document.querySelector(`.producto-selector[value="${productoInput.value}"]`);
+                if(checkbox) checkbox.checked = false;
+            }
+            marcarParaBorrar(row);
+        }
+    });
+
+    function agregarProducto(checkbox) {
+        const productoId = checkbox.value;
+        const descripcion = checkbox.dataset.descripcion;
+        const stock = checkbox.dataset.stock;
+        const index = parseInt(totalFormsInput.value);
+        let newRowHtml = templateRow.replace(/__prefix__/g, index);
+        container.insertAdjacentHTML('beforeend', newRowHtml);
+        totalFormsInput.value = index + 1;
+        const newRow = document.getElementById(`row-${index}`);
+        newRow.querySelector(`input[name="turnoproducto_set-${index}-producto"]`).value = productoId;
+
+        newRow.querySelector('.descripcion-visual').value = descripcion;
+        newRow.querySelector('.stock-visual').innerText = `Stock: ${stock}`;
+
+        checkbox.dataset.formPrefix = index;
+    }
+
+    function quitarProducto(checkbox) {
+        const prefix = checkbox.dataset.formPrefix;
+        if (prefix !== undefined) {
+            const row = document.getElementById(`row-${prefix}`);
             if (row) {
                 marcarParaBorrar(row);
             }
         }
-    });
-});
-</script>
+    }
 
+    function marcarParaBorrar(row) {
+        const deleteInput = row.querySelector('input[name$="-DELETE"]');
+        const idInput = row.querySelector('input[name$="-id"]'); // ID de base de datos
+
+        if (idInput && idInput.value) {
+            // Si el item ya existe en BD, marcamos DELETE y ocultamos
+            deleteInput.checked = true;
+            row.classList.add('d-none');
+        } else {
+            row.remove();
+        }
+    }
+});
+
+</script>
 {% endblock %}
