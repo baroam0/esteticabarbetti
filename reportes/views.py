@@ -1,0 +1,55 @@
+
+
+from datetime import datetime
+from django.shortcuts import render
+
+from cosmiatras.models import Cosmetologa
+from turnos.models import Turno
+from .forms import ReporteCosmiatraForm
+
+
+def reporte_cosmiatra(request):
+    form = ReporteCosmiatraForm(request.GET or None)
+
+    turnos=""
+    total=""
+    comision=""
+    porcentaje=""
+    
+    if form.is_valid():
+        fecha_desde = form.cleaned_data.get("fecha_desde")
+        fecha_hasta = form.cleaned_data.get("fecha_hasta")
+        cosmiatra = form.cleaned_data.get("cosmiatra")
+        porcentaje = form.cleaned_data.get("porcentaje")
+           
+        cosmetologa = Cosmetologa.objects.get(pk=cosmiatra.pk)
+
+        if fecha_desde and fecha_hasta:
+            fecha_hasta = datetime.combine(fecha_hasta, datetime.max.time()) 
+            fecha_desde = datetime.combine(fecha_desde, datetime.min.time())
+
+            turnos = Turno.objects.filter( 
+                fecha_hora__range=(fecha_desde, fecha_hasta), 
+                cosmetologa=cosmetologa
+            )
+
+            total = 0
+
+            for t in turnos:
+                total = total + t.monto
+
+            comision = total * porcentaje / 100
+
+    return render(
+        request, 
+        "reportes/reporte_cosmiatra.html", 
+        {
+            "form": form, 
+            "turnos": turnos, 
+            "total": total,
+            "comision": comision,
+            "porcentaje": porcentaje
+        }
+    )
+
+# Create your views here.
