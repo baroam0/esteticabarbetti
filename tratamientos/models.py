@@ -19,5 +19,4 @@ class Tratamiento(models.Model):
     class Meta:
         verbose_name_plural = "Tratamientos"
 
-
 # Create your models here.

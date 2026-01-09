@@ -84,4 +84,6 @@ class TurnoForm(forms.ModelForm):
         super().__init__(*args, **kwargs)
         self.fields['fecha_hora'].input_formats = ['%Y-%m-%dT%H:%M']
         self.fields['numerodocumento'].required = True
+        self.fields['tratamientos'].queryset = self.fields['tratamientos'].queryset.order_by('descripcion')
+
 
