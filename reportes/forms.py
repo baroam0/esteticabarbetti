@@ -28,6 +28,7 @@ class ReporteCosmiatraForm(forms.Form):
 
     cosmiatra = forms.ModelChoiceField(
         queryset=Cosmetologa.objects.all(), 
+        required=True,
         #empty_label="Todos",
         widget=forms.Select(
             attrs={'class': 'form-control'}
