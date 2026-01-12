@@ -15,6 +15,7 @@ def reporte_cosmiatra(request):
     total=""
     comision=""
     porcentaje=""
+    lista_turnos = []
     
     if form.is_valid():
         fecha_desde = form.cleaned_data.get("fecha_desde")
@@ -35,7 +36,7 @@ def reporte_cosmiatra(request):
 
             total = 0
 
-            lista_turnos = [] 
+            
 
             for turno in turnos:
                 total = total + turno.monto
