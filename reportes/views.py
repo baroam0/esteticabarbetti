@@ -4,7 +4,7 @@ from datetime import datetime
 from django.shortcuts import render
 
 from cosmiatras.models import Cosmetologa
-from turnos.models import Turno
+from turnos.models import Turno, TurnoProducto
 from .forms import ReporteCosmiatraForm
 
 
@@ -35,8 +35,21 @@ def reporte_cosmiatra(request):
 
             total = 0
 
-            for t in turnos:
-                total = total + t.monto
+            lista_turnos = [] 
+
+            for turno in turnos:
+                total = total + turno.monto
+                productos = TurnoProducto.objects.filter(turno=turno.pk)
+
+                lista_turnos.append(
+                    {
+                        "fecha": turno.fecha_hora,
+                        "monto": turno.monto,
+                        "paciente": turno.nombrepaciente.upper(),
+                        "producto": " - ".join([p.producto.descripcion for p in productos]),
+                        "tratamiento": " - ".join([t.descripcion for t in turno.tratamientos.all()]),
+                    }
+                ) 
 
             comision = total * porcentaje / 100
 
@@ -45,7 +58,7 @@ def reporte_cosmiatra(request):
         "reportes/reporte_cosmiatra.html", 
         {
             "form": form, 
-            "turnos": turnos, 
+            "turnos": lista_turnos, 
             "total": total,
             "comision": comision,
             "porcentaje": porcentaje

@@ -48,7 +48,8 @@
                 <tr>
                     <th>Fecha</th>
                     <th>Paciente</th>
-                    <th>Cosmiatra</th>
+                    <th>Tratamientos</th>
+                    <th>Productos</th>
                     <th>Monto</th>
                     <th>Porcentaje</th>
                 </tr>
@@ -57,10 +58,11 @@
             <tbody id="tbodyProductos">
               {% for t in turnos %}
               <tr>
-                <td>{{ t.fecha_hora|date:"d/m/Y H:i" }}</td>
-                <td>{{ t.nombrepaciente }}</td>
-                <td>{{ t.cosmetologa }}</td>
-                <td>{{ t.monto }}</td>
+                <td>{{ t.fecha|date:"d/m/Y H:i" }}</td>
+                <td>{{ t.paciente }}</td>
+                <td>{{ t.tratamiento }}</td>
+                <td>{{ t.producto }}</td>
+                <td> $ {{ t.monto }}</td>
                 <td>{{ porcentaje }}%</td>
               </tr>
               {% endfor %}
