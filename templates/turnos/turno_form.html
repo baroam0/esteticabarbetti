@@ -4,7 +4,7 @@
 {% block content %}
 <div class="container-fluid">
     <h1 class="h3 mb-4 text-gray-800">
-        {% if form.instance.pk %}Editar Turno{% else %}Nuevo Turno{% endif %}
+        {% if form.instance.pk %}Editar Turno {% else %}Nuevo Turno{% endif %}
     </h1>
 
     <div class="row">
@@ -12,7 +12,7 @@
             <div class="card shadow mb-4">
                 <div class="card-header py-3">
                     <h6 class="m-0 font-weight-bold text-primary">
-                        {% if form.instance.pk %}Modificar datos del turno{% else %}Completar datos del turno{% endif %}
+                        {% if form.instance.pk %}Ultima modificación - {{form.instance.usuario}} {{form.instance.fecha_modificacion}} {% else %}Nuevo Turno{% endif %}
                     </h6>
                 </div>
                 <div class="card-body">
@@ -37,12 +37,6 @@
                         <div class="form-group">
                             <label for="id_sexo">Sexo </label>
                             {{ form.sexo }}
-                        </div>
-
-
-                        <div class="form-group">
-                            <label for="id_monto">Monto</label>
-                            {{ form.monto }}
                         </div>
 
                         <div class="form-group">
@@ -99,6 +93,10 @@
                             </div>
                         </div>
 
+                        <div class="form-group">
+                            <label for="id_monto">Monto</label>
+                            {{ form.monto }}
+                        </div>
 
                         <div class="card shadow mb-4">
                             <div class="card-header py-3 bg-light">

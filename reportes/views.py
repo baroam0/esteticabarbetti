@@ -32,11 +32,9 @@ def reporte_cosmiatra(request):
             turnos = Turno.objects.filter( 
                 fecha_hora__range=(fecha_desde, fecha_hasta), 
                 cosmetologa=cosmetologa
-            )
+            ).order_by("-fecha_hora")
 
-            total = 0
-
-            
+            total = 0            
 
             for turno in turnos:
                 total = total + turno.monto
