@@ -48,8 +48,8 @@ def listar_historiasclinicas(request, pk):
             {
                 "cosmiatra": turno.cosmetologa,
                 "fecha_hora": turno.fecha_hora, 
-                "tratamiento": ", ".join([t.descripcion for t in turno.tratamientos.all()]),
-                "producto": ", ".join([p.producto.descripcion for p in productos]),
+                "tratamiento": " - ".join([t.descripcion for t in turno.tratamientos.all()]),
+                "producto": " - ".join([p.producto.descripcion for p in productos]),
             }
         ) 
 

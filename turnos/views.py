@@ -4,17 +4,93 @@ from decimal import Decimal
 
 from django.db import transaction
 from django.contrib import messages
+from django.contrib.auth.decorators import login_required
+from django.core.paginator import Paginator
 from django.http import JsonResponse
 from django.views.generic import ListView, CreateView, UpdateView
 from django.views import View
 from django.urls import reverse_lazy
-from django.shortcuts import redirect
+from django.shortcuts import redirect, render
 
 from .models import Turno, TurnoProducto
 from .forms import TurnoForm, TurnoProductoFormSet
 
 from cosmiatras.models import Cosmetologa
 from productos.models import HistorialProducto
+
+
+@login_required
+def listar_turnos(request):
+    turnos =  Turno.objects.all().order_by("-fecha_hora")
+    paginador = Paginator(turnos, 10)
+
+    if "page" in request.GET:
+        page = request.GET.get('page')
+    else:
+        page = 1
+    resultados = paginador.get_page(page)
+
+    for r in resultados:
+        print(r.cosmetologa)
+
+    return render(request, 'turnos/listado_turnos.html', {'results': resultados})
+
+
+@login_required
+def buscar_turnos(request):
+    parametro = request.GET.get('q', '')
+    page_number = request.GET.get('page', 1)
+
+    if parametro:
+        turnos = Turno.objects.filter(
+            nombrepaciente__icontains=parametro
+        ).order_by("-fecha_hora")
+    else:
+        turnos = Turno.objects.all().order_by("-fecha_hora")
+
+    paginator = Paginator(turnos, 10)
+    page_obj = paginator.get_page(page_number)
+
+    MESES = { 
+        1: "Enero", 
+        2: "Febrero", 
+        3: "Marzo", 
+        4: "Abril", 
+        5: "Mayo", 
+        6: "Junio", 
+        7: "Julio", 
+        8: "Agosto", 
+        9: "Septiembre", 
+        10: "Octubre", 
+        11: "Noviembre", 
+        12: "Diciembre",
+    }
+
+    data = [{ 
+        "fecha_hora": f"{p.fecha_hora.day} {MESES[p.fecha_hora.month]} {p.fecha_hora.year} {p.fecha_hora.strftime('%H:%M')}", 
+        "nombrepaciente": p.nombrepaciente, 
+        "cosmetologa": f"{p.cosmetologa.nombre.upper()}, {p.cosmetologa.apellido.upper()}", 
+        "pk": p.pk, } for p in page_obj]
+
+    """
+    data = [{
+        "fecha_hora": p.fecha_hora.isoformat(),
+        "nombrepaciente": p.nombrepaciente,
+        "cosmetologa": str(p.cosmetologa.nombre.upper() + ", " + p.cosmetologa.apellido.upper()),
+        "pk": p.pk,
+    } for p in page_obj]
+    """
+
+
+    return JsonResponse({
+        "results": data,
+        "page": page_obj.number,
+        "total_pages": paginator.num_pages,
+        "has_next": page_obj.has_next(),
+        "has_previous": page_obj.has_previous(),
+        "next_page": page_obj.next_page_number() if page_obj.has_next() else None,
+        "prev_page": page_obj.previous_page_number() if page_obj.has_previous() else None,
+    })
 
 class TurnoListView(ListView):
     model = Turno
