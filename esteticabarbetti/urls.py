@@ -35,6 +35,7 @@ urlpatterns = [
     path('tratamientos/', include('tratamientos.urls')),
     path('turnos/', include('turnos.urls')),
     path('reportes/', include('reportes.urls')),
+    path('ayuda/', include('ayuda.urls')),
 ]
 
 if settings.DEBUG:

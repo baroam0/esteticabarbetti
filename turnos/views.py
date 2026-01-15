@@ -66,20 +66,16 @@ def buscar_turnos(request):
         12: "Diciembre",
     }
 
-    data = [{ 
-        "fecha_hora": f"{p.fecha_hora.day} {MESES[p.fecha_hora.month]} {p.fecha_hora.year} {p.fecha_hora.strftime('%H:%M')}", 
-        "nombrepaciente": p.nombrepaciente, 
-        "cosmetologa": f"{p.cosmetologa.nombre.upper()}, {p.cosmetologa.apellido.upper()}", 
-        "pk": p.pk, } for p in page_obj]
-
-    """
-    data = [{
-        "fecha_hora": p.fecha_hora.isoformat(),
-        "nombrepaciente": p.nombrepaciente,
-        "cosmetologa": str(p.cosmetologa.nombre.upper() + ", " + p.cosmetologa.apellido.upper()),
-        "pk": p.pk,
-    } for p in page_obj]
-    """
+    data = [
+        { 
+            "fecha_hora": f"{p.fecha_hora.day} {MESES[p.fecha_hora.month]} {p.fecha_hora.year} {p.fecha_hora.strftime('%H:%M')}", 
+            "nombrepaciente": p.nombrepaciente, 
+            "cosmetologa": f"{p.cosmetologa.nombre.upper()}, {p.cosmetologa.apellido.upper()}", 
+            "pk": p.pk, 
+            "pagado": p.pagado, 
+        } 
+        for p in page_obj
+    ]
 
 
     return JsonResponse({

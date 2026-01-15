@@ -24,6 +24,7 @@
                 <tr>
                     <th>Fecha </th>
                     <th>Paciente</th>
+                    <th>Pagado</th>
                     <th>Cosmiatra</th>
                     <th>Turno</th>
                 </tr>
@@ -33,8 +34,14 @@
                 <tr>
                     <td>{{ t.fecha_hora }}</td>
                     <td>{{ t.nombrepaciente }}</td>
+                    <td>
+                        {%if t.pagado %}
+                            <i class="fas fa-fw fa-check-circle"></i>
+                        {%else%}
+                            <i class="fas fa-fw fa-minus-circle"></i>
+                        {%endif%}
+                    </td>
                     <td>{{ t.cosmetologa }} </td>
-
                     <td>
                         <button type="button" class="btn btn-outline-success btn-sm" onclick="location.href='/turnos/editar/{{ t.pk }}'">
                             <i class="fas fa-fw fa-address-book"></i>

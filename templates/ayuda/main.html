@@ -1,0 +1,78 @@
+{% extends 'base.html' %}
+
+{%block content %}
+<!-- Page Heading -->
+<div class="d-sm-flex align-items-center justify-content-between mb-4">
+    <h1 class="h3 mb-0 text-gray-800">Descripción General</h1>
+</div>
+
+<!-- Content Row -->
+<div class="row">
+
+    <!-- Card Principal -->
+    <div class="col-lg-12">
+        <div class="card shadow mb-4">
+            
+            <!-- Card Header -->
+            <div class="card-header py-3">
+                <h3 class="m-0 font-weight-bold text-primary">Información General</h3>
+            </div>
+
+            <!-- Card Body -->
+            <div class="card-body">
+                <p>
+                    Esta aplicación web permite gestionar de forma centralizada los 
+                    <strong>tratamientos</strong>, <strong>productos</strong>, 
+                    <strong>turnos</strong> y <strong>reportes</strong>. 
+                    Su objetivo es ofrecer una plataforma clara y eficiente para la administración 
+                    diaria de información operativa.
+                </p>
+
+                <h5 class="font-weight-bold text-primary mt-4">Tipos de Usuario</h5>
+
+                <h6 class="font-weight-bold text-secondary mt-3">Administrador</h6>
+                <p>
+                    Posee acceso total a todos los módulos del sistema. Puede crear, editar, 
+                    eliminar y visualizar cualquier registro, además de gestionar configuraciones 
+                    generales.
+                </p>
+
+                <h6 class="font-weight-bold text-secondary mt-3">Usuario Común</h6>
+                <p>
+                    Cuenta con acceso restringido. Solo puede visualizar y operar en los módulos 
+                    habilitados para su rol, sin permisos administrativos.
+                </p>
+
+                <h5 class="font-weight-bold text-primary mt-4">Estructura de Navegación</h5>
+                <p>
+                    La aplicación utiliza un menú lateral compuesto por elementos llamados 
+                    <strong>Módulos</strong>. Cada módulo representa una sección funcional del sistema.
+                </p>
+
+                <ul class="list-group mb-3">
+                    <li class="list-group-item">
+                        <strong>Tratamientos:</strong> muestra un listado de tratamientos disponibles.
+                    </li>
+                    <li class="list-group-item">
+                        <strong>Productos:</strong> permite visualizar y gestionar el inventario.
+                    </li>
+                    <li class="list-group-item">
+                        <strong>Turnos:</strong> presenta un <strong>calendario</strong> interactivo para administrar citas.
+                    </li>
+                    <li class="list-group-item">
+                        <strong>Reportes:</strong> ofrece acceso a informes generados a partir de los datos del sistema.
+                    </li>
+                </ul>
+
+                <p>
+                    Excepto el módulo de Turnos, cada sección inicia mostrando un listado desde el cual 
+                    el usuario puede crear nuevos registros, editar información o consultar detalles, 
+                    según sus permisos.
+                </p>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+{% endblock %}

@@ -28,7 +28,9 @@ document.addEventListener('DOMContentLoaded', function () {
     let calendarEl = document.getElementById('calendar');
 
     calendar = new FullCalendar.Calendar(calendarEl, {
-
+        slotEventOverlap: false,
+        allDaySlot: true,
+        slotDuration: '00:15:00',
         headerToolbar: { 
             left: 'prev,next today', 
             center: 'title', 
