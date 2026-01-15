@@ -108,10 +108,17 @@ function actualizarVista(data) {
     tbody.innerHTML = "";
 
     data.results.forEach(p => {
+
+        let iconito = p.pagado 
+            ? '<i class="fas fa-fw fa-check-circle"></i>' 
+            : '<i class="fas fa-fw fa-minus-circle"></i>';
+    
+
         tbody.innerHTML += `
             <tr>
                 <td>${p.fecha_hora}</td>
                 <td>${p.nombrepaciente}</td>
+                <td>${iconito}</td>
                 <td>${p.cosmetologa}</td>
                 <td>
                     <button type="button" class="btn btn-outline-secondary btn-sm" onclick="location.href='/turnos/editar/${p.pk}'">
