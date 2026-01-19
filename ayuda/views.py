@@ -15,5 +15,8 @@ def tratamientos(request):
     return render(request, "ayuda/tratamientos.html")
 
 
+def productos(request):
+    return render(request, "ayuda/productos.html")
+
 
 # Create your views here.

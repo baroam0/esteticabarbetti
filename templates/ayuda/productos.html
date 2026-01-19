@@ -5,7 +5,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <title>Manual de Usuario - Listado de Tratamientos</title>
+    <title>Manual de Usuario - Listado de Productos</title>
     <!-- SB Admin 2 CSS -->
     <link href="vendor/fontawesome-free/css/all.min.css" rel="stylesheet" type="text/css">
     <link href="css/sb-admin-2.min.css" rel="stylesheet">
@@ -13,24 +13,20 @@
 
 <body id="page-top">
 
+
     <div id="wrapper">
-
         <div id="content-wrapper" class="d-flex flex-column">
-
             <div id="content" class="container-fluid">
+                <h1 class="h3 mb-4 text-gray-800">Manual de Usuario - Módulo Listado de Productos</h1>
 
-                <h1 class="h3 mb-4 text-gray-800">Manual de Usuario - Módulo Listado de Tratamientos</h1>
-
-                
                 <p>
-                    El módulo de <strong>Listado de Tratamientos</strong> permite visualizar todos los tratamientos cargados en el sistema.
+                    El módulo de <strong>Listado de Productos</strong> permite visualizar todos los tratamientos cargados en el sistema.
                     Al ingresar, se muestra un listado acompañado de un buscador para localizar rápidamente un tratamiento específico.
                 </p>
 
-                <!-- Buscador -->
                 <div class="card shadow mb-4">
                     <div class="card-header py-3">
-                        <h6 class="m-0 font-weight-bold text-primary">Buscador de Tratamientos</h6>
+                        <h6 class="m-0 font-weight-bold text-primary">Buscador de Productos</h6>
                     </div>
                     <div class="card-body">
                         <form class="mb-3">
@@ -47,14 +43,13 @@
                 </div>
 
                 <p>
-                    El buscador funciona tipeando la descripcion del producto, tratando de hacer coincidir el texto ingresado o contenga una parte del texto en su descripcion. Si se ingrea la 
-                    palabra <strong>acido</strong>, <strong>ACIDO</strong> o <strong>Acido</strong>, buscara los productos que tengan coincidencia con lo ingresado.
+                    El buscador funciona tipeando la descripcion del tratamiento, tratando de hacer coincidir el texto ingresado o contenga una parte del texto en su descripcion. Si se ingrea la 
+                    palabra <strong>depi</strong>, <strong>DEPI</strong> o <strong>Depi</strong>, buscara los tratamientos que tengan coincidencia con lo ingresado.
                 </p>
 
-                <!-- Tabla de tratamientos -->
                 <div class="card shadow mb-4">
                     <div class="card-header py-3">
-                        <h6 class="m-0 font-weight-bold text-primary">Listado de Productos</h6>
+                        <h6 class="m-0 font-weight-bold text-primary">Listado de Productos </h6>
                     </div>
                     <div class="card-body">
                         <div class="table-responsive">
@@ -63,15 +58,16 @@
                                     <tr>
                                         <th>Descripcion</th>
                                         <th>Precio</th>
+                                        <th>Stock</th>
                                         <th>Cargado por</th>
-                                        
                                         <th>Editar</th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                     <tr>
-                                        <td>Tratamiento A</td>
+                                        <td>Producto A</td>
                                         <td>$1000</td>
+                                        <td>15</td>
                                         <td>Juan Pérez - 10/01/2026 10:00 </td>
                                         <td>                                            
                                             <button type="button" class="btn btn-outline-secondary btn-sm">
@@ -80,8 +76,9 @@
                                         </td>
                                     </tr>
                                     <tr>
-                                        <td>Tratamiento B</td>
+                                        <td>Producto B</td>
                                         <td>$1500</td>
+                                        <td>22</td>
                                         <td>María Gómez - 12/01/2026 09:00 </td>
                                         <td>
                                             <button type="button" class="btn btn-outline-secondary btn-sm">
@@ -96,17 +93,15 @@
                 </div>                
 
                 <p>
-                    En el listado de tratamientos el boton 
+                    En el listado de productos el boton 
                     <button type="button" class="btn btn-outline-secondary btn-sm">                            
                         <i class="fas fa-pencil-alt"></i> 
-                    </button> permitira editar la descripcion y el precio del tratamiento. 
+                    </button> permitira editar la descripcion, el precio y el stock del tratamiento. 
                     Cada vez que un usuario edite algo, el nombre de este, 
-                    la fecha y hora de la acción se registrara y mostrará.
-    
+                    la fecha y hora de la acción se registrara y mostrará.    
                 </p>
             
             </div>
-
 
             <div class="container-fluid">
                 <div class="card o-hidden border-0 shadow-lg my-5">
@@ -115,19 +110,25 @@
                             <div class="col-lg-12">
                                 <div class="p-5">
                                     <div class="text-center">
-                                        <h1 class="h4 text-gray-900 mb-4">Editar Tratamiento</h1>
+                                        <h1 class="h4 text-gray-900 mb-4">Editar Producto</h1>
                                     </div>
 
-                                    <form>
+                                    <form> 
                                         <div class="form-group row">
                                             <div class="col-sm-12 mb-3 mb-sm-0">
-                                                <input type="text" name="descripcion" value="DEPI FACIAL" placeholder="Descripcion" maxlength="100" class="form-control form-control-user" required id="id_descripcion">
+                                                <input type="text" name="descripcion"  placeholder="Descripcion" maxlength="100" class="form-control form-control-user" >
                                             </div>
                                         </div>
 
                                         <div class="form-group row">
                                             <div class="col-sm-12 mb-3 mb-sm-0">
-                                                <input type="number" name="precio" value="30000.00" step="any" class="form-control form-control-user" required id="id_precio">
+                                                <input type="number" placeholder="Precio" class="form-control form-control-user" >
+                                            </div>
+                                        </div>
+
+                                        <div class="form-group row">
+                                            <div class="col-sm-12 mb-3 mb-sm-0">
+                                                <input type="number" placeholder="Stock" class="form-control form-control-user" >
                                             </div>
                                         </div>
 
@@ -138,7 +139,7 @@
                                                 </button>
                                             </div>
                                             <div class="col-sm-6">
-                                                <button type="button" class="btn btn-secondary btn-user btn-block" onclick="Volver()"">
+                                                <button type="button" class="btn btn-secondary btn-user btn-block" >
                                                     Cancelar
                                                 </button>
                                             </div>
