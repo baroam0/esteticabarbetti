@@ -1,0 +1,48 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Usuario Inactivo</title>
+    <!-- AdminLTE 2 CSS -->
+    <link rel="stylesheet" href="{% static 'adminlte2/css/AdminLTE.min.css' %}">
+    <link rel="stylesheet" href="{% static 'adminlte2/css/skins/skin-blue.min.css' %}">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="{% static 'adminlte2/plugins/fontawesome/css/font-awesome.min.css' %}">
+    <!-- Bootstrap -->
+    <link rel="stylesheet" href="{% static 'adminlte2/bootstrap/css/bootstrap.min.css' %}">
+</head>
+<body class="hold-transition login-page">
+
+<div class="login-box">
+    <div class="login-logo">
+        <a href="#"><b>Acceso</b> Restringido</a>
+    </div>
+    <!-- /.login-logo -->
+    <div class="login-box-body">
+        <p class="login-box-msg text-danger">
+            Tu cuenta está <strong>inactiva</strong>.  
+            Por favor contacta al administrador para más información.
+        </p>
+
+        <div class="text-center" style="margin-top:20px;">
+            <i class="fa fa-ban fa-4x text-red"></i>
+        </div>
+
+        <div class="text-center" style="margin-top:30px;">
+            <a href="{% url 'login' %}" class="btn btn-primary btn-block">
+                <i class="fa fa-sign-in"></i> Volver al Login
+            </a>
+        </div>
+    </div>
+    <!-- /.login-box-body -->
+</div>
+<!-- /.login-box -->
+
+<!-- Scripts -->
+<script src="{% static 'adminlte2/plugins/jQuery/jquery-2.2.3.min.js' %}"></script>
+<script src="{% static 'adminlte2/bootstrap/js/bootstrap.min.js' %}"></script>
+<script src="{% static 'adminlte2/js/app.min.js' %}"></script>
+</body>
+</html>

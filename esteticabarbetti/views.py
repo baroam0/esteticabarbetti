@@ -29,8 +29,7 @@ def loginusuario(request):
             login(request, acceso)
             return redirect('/')
         else:
-            print("pasa aca")
-            mensaje = "Usuario o Clave invalida"
+            mensaje = "Usuario o Clave invalida."
             return render(
                 request,
                 'login.html',
