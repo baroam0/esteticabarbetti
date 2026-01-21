@@ -23,13 +23,18 @@
                 </div>
 
                 <div class="form-row">
-                    <div class="form-group col-md-6">
+                    <div class="form-group col-md-4">
                         <label for="id_sexo">Sexo</label>
                         {{ form.sexo }}
                     </div>
-                    <div class="form-group col-md-6">
+                    <div class="form-group col-md-4">
                         <label for="id_fechanacimiento">Fecha Nacimiento</label>
                         {{ form.fechanacimiento }}
+                    </div>
+                    
+                    <div class="form-group col-md-4"> 
+                        <label>Edad</label> 
+                        <input type="text" id="id_edad" class="form-control" readonly> 
                     </div>
                 </div>
 
@@ -110,10 +115,44 @@
 </div>
 {% endblock %}
 
+
 {% block js %}
 <script>
     function Volver() {
         window.location.replace("/pacientes/lista");
     }
+
+    function calcularEdad(fecha) {
+        if (!fecha) return "";
+
+        const hoy = new Date();
+        const nacimiento = new Date(fecha);
+
+        let edad = hoy.getFullYear() - nacimiento.getFullYear();
+        const mes = hoy.getMonth() - nacimiento.getMonth();
+
+        if (mes < 0 || (mes === 0 && hoy.getDate() < nacimiento.getDate())) {
+            edad--;
+        }
+
+        return edad;
+    }
+
+    document.addEventListener("DOMContentLoaded", function () {
+        const inputFecha = document.getElementById("id_fechanacimiento");
+        const inputEdad = document.getElementById("id_edad");
+
+        function actualizarEdad() {
+            const fecha = inputFecha.value;
+            const edad = calcularEdad(fecha);
+            inputEdad.value = edad ? edad + " años" : "";
+        }
+
+        // Calcular si ya viene cargado (modo edición)
+        actualizarEdad();
+
+        // Recalcular cuando el usuario cambia la fecha
+        inputFecha.addEventListener("change", actualizarEdad);
+    });
 </script>
 {% endblock %}
