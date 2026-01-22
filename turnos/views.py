@@ -3,6 +3,7 @@ from datetime import datetime
 from decimal import Decimal
 
 from django.db import transaction
+from django.db.models import Q
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator
@@ -11,6 +12,7 @@ from django.views.generic import ListView, CreateView, UpdateView
 from django.views import View
 from django.urls import reverse_lazy
 from django.shortcuts import redirect, render
+
 
 from .models import Turno, TurnoProducto
 from .forms import TurnoForm, TurnoProductoFormSet
@@ -30,9 +32,6 @@ def listar_turnos(request):
         page = 1
     resultados = paginador.get_page(page)
 
-    for r in resultados:
-        print(r.cosmetologa)
-
     return render(request, 'turnos/listado_turnos.html', {'results': resultados})
 
 
@@ -42,9 +41,13 @@ def buscar_turnos(request):
     page_number = request.GET.get('page', 1)
 
     if parametro:
-        turnos = Turno.objects.filter(
-            nombrepaciente__icontains=parametro
+
+        turnos = Turno.objects.filter( 
+            Q(nombrepaciente__icontains=parametro) | 
+            Q(cosmetologa__nombre__icontains=parametro) | 
+            Q(cosmetologa__apellido__icontains=parametro) 
         ).order_by("-fecha_hora")
+
     else:
         turnos = Turno.objects.all().order_by("-fecha_hora")
 
