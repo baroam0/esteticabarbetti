@@ -29,6 +29,7 @@ urlpatterns = [
     path('login/', loginusuario, name="login"),
     path('cosmiatras/', include('cosmiatras.urls')),
     path('historiasclinicas/', include('historiasclinicas.urls')),
+    path('ingresos/', include('ingresos.urls')),
     path('usuarios/', include('usuarios.urls')),
     path('pacientes/', include('pacientes.urls')),
     path('productos/', include('productos.urls')),
