@@ -23,7 +23,7 @@ from productos.models import HistorialProducto
 
 @login_required
 def listar_turnos(request):
-    turnos =  Turno.objects.all().order_by("-fecha_hora")
+    turnos =  Turno.objects.all().order_by("pagado", "-fecha_hora")
     paginador = Paginator(turnos, 10)
 
     if "page" in request.GET:
@@ -46,7 +46,7 @@ def buscar_turnos(request):
             Q(nombrepaciente__icontains=parametro) | 
             Q(cosmetologa__nombre__icontains=parametro) | 
             Q(cosmetologa__apellido__icontains=parametro) 
-        ).order_by("-fecha_hora")
+        ).order_by("pagado", "-fecha_hora")
 
     else:
         turnos = Turno.objects.all().order_by("-fecha_hora")
