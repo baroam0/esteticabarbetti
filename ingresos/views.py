@@ -4,11 +4,8 @@ from django.core.paginator import Paginator
 from django.shortcuts import redirect, render, get_object_or_404
 from .models import Ingreso
 
-def ingresos_view(request):
 
-    # -----------------------------
-    # 1. Guardar / Editar ingreso
-    # -----------------------------
+def ingresos_view(request):
     if request.method == "POST":
         id_ingreso = request.POST.get("id_ingreso")
 
@@ -25,53 +22,33 @@ def ingresos_view(request):
 
         return redirect("ingresos")
 
-    # -----------------------------
-    # 2. Filtros por año y mes
-    # -----------------------------
-    current_year = date.today().year
-    last_year = current_year - 1
-
-    anio = request.GET.get("anio", current_year)
-    mes = request.GET.get("mes", "0")  # 0 = todos los meses
+    # --- NUEVOS FILTROS ---
+    fecha_desde = request.GET.get("fecha_desde", "")
+    fecha_hasta = request.GET.get("fecha_hasta", "")
 
     ingresos_list = Ingreso.objects.filter(usuario=request.user).order_by("-fecha")
 
-    # Filtrar por año
-    if anio:
-        ingresos_list = ingresos_list.filter(fecha__year=anio)
+    if fecha_desde:
+        ingresos_list = ingresos_list.filter(fecha__gte=fecha_desde)
 
-    # Filtrar por mes (si mes != 0)
-    if mes != "0":
-        ingresos_list = ingresos_list.filter(fecha__month=mes)
+    if fecha_hasta:
+        ingresos_list = ingresos_list.filter(fecha__lte=fecha_hasta)
 
-    # -----------------------------
-    # 3. Calcular ingresos, egresos y saldo del período filtrado
-    # -----------------------------
     ingreso_dinero = sum(i.monto for i in ingresos_list if i.monto > 0)
     egreso_dinero = sum(i.monto for i in ingresos_list if i.monto < 0)
     saldo = ingreso_dinero + egreso_dinero
 
-    # -----------------------------
-    # 4. Paginación
-    # -----------------------------
     paginator = Paginator(ingresos_list, 20)
     page_number = request.GET.get("page")
     ingresos = paginator.get_page(page_number)
 
-    # -----------------------------
-    # 5. Render
-    # -----------------------------
     return render(request, "ingresos/ingresos.html", {
         "ingresos": ingresos,
         "saldo": saldo,
         "ingreso_dinero": ingreso_dinero,
         "egreso_dinero": egreso_dinero,
-        "current_year": current_year,
-        "last_year": last_year,
-        "anio_seleccionado": int(anio),
-        "mes_seleccionado": int(mes),
+        "fecha_desde": fecha_desde,
+        "fecha_hasta": fecha_hasta,
     })
-
-
 
 # Create your views here.
