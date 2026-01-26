@@ -26,7 +26,7 @@ def ingresos_view(request):
     fecha_desde = request.GET.get("fecha_desde", "")
     fecha_hasta = request.GET.get("fecha_hasta", "")
 
-    ingresos_list = Ingreso.objects.filter(usuario=request.user).order_by("-fecha")
+    ingresos_list = Ingreso.objects.filter(usuario=request.user).order_by("-id")
 
     if fecha_desde:
         ingresos_list = ingresos_list.filter(fecha__gte=fecha_desde)
