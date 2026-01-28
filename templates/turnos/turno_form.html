@@ -2,6 +2,17 @@
 {% load static %}
 
 {% block content %}
+
+
+<style>
+    .tratamiento-seleccionado {
+        background-color: #e2f0d9;   /* verde suave */
+        border: 1px solid #5a7f4b;
+        transition: background-color 0.2s ease;
+    }
+
+</style>
+
 <div class="container-fluid">
     <h1 class="h3 mb-4 text-gray-800">
         {% if form.instance.pk %}Editar Turno {% else %}Nuevo Turno{% endif %}
@@ -34,7 +45,7 @@
                             {{ form.numerodocumento }}
                         </div>
 
-                        <div class="form-group">
+                        <div class="form-gr oup">
                             <label for="id_sexo">Sexo </label>
                             {{ form.sexo }}
                         </div>
@@ -436,6 +447,28 @@ document.addEventListener("DOMContentLoaded", function () {
         }
     });
 });
+
+
+document.addEventListener("DOMContentLoaded", function () {
+    // Para tratamientos
+    document.querySelectorAll(".tratamiento-checkbox").forEach(chk => {
+        chk.addEventListener("change", function () {
+            const card = this.closest(".card");
+            if (this.checked) {
+                card.classList.add("tratamiento-seleccionado");
+            } else {
+                card.classList.remove("tratamiento-seleccionado");
+            }
+        });
+
+        // Si ya viene marcado desde el backend
+        if (chk.checked) {
+            chk.closest(".card").classList.add("tratamiento-seleccionado");
+        }
+    });
+});
+
+
 </script>
 
 {% endblock %}
