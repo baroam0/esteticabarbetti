@@ -25,7 +25,7 @@ def cargar_pacientes():
                 fecha=None
             domicilio = sss[6]
             telefono = sss[9]
-            
+
             existe = Paciente.objects.filter(
                 idaccess=sss[0]
             ).exists()

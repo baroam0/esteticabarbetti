@@ -24,7 +24,11 @@ def cargar_hc():
             sss = linea.split(";")
 
             fecha = sss[2] + " " + sss[3]
-            fecha_obj = datetime.strptime(fecha, "%d/%m/%Y %H:%M")
+            
+            fecha_obj = timezone.make_aware(
+                datetime.strptime(fecha, "%d/%m/%Y %H:%M"),
+                timezone.get_current_timezone()
+            )
             
             existe = HistoriaClinica.objects.filter(
                 fecha=fecha_obj
@@ -38,10 +42,7 @@ def cargar_hc():
                 fecha = sss[2] + " " + sss[3]
                 #fecha_obj = datetime.strptime(fecha, "%d/%m/%Y %H:%M")
 
-                fecha_obj = timezone.make_aware(
-                    datetime.strptime(fecha, "%d/%m/%Y %H:%M"),
-                    timezone.get_current_timezone()
-                )
+                
 
                 HistoriaClinica.objects.create(
                     paciente=paciente,
