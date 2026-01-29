@@ -18,7 +18,7 @@ class HistoriaClinica(models.Model):
     responsable = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True)
 
     def __str__(self):
-        return self.diagnostico
+        return str(self.pk)
 
     def save(self, *args, **kwargs):
         # Si la fecha está vacía o nula, asignamos la fecha y hora actual
@@ -38,7 +38,8 @@ class ImagenHistoriaClinica(models.Model):
     imagen = models.ImageField(upload_to='historias_clinicas/')
 
     def __str__(self):
-        return f"Imagen de {self.historiaclinica.diagnostico}"
+        #return f"Imagen de {self.historiaclinica.diagnostico}"
+        return str(self.historiaclinica.pk)
 
 
 # Create your models here.
