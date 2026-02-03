@@ -24,6 +24,7 @@
                 <tr>
                     <th>Fecha </th>
                     <th>Paciente</th>
+                    <th>Tratamientos</th>
                     <th>Pagado</th>
                     <th>Cosmiatra</th>
                     <th>Turno</th>
@@ -34,6 +35,11 @@
                 <tr>
                     <td>{{ t.fecha_hora }}</td>
                     <td>{{ t.nombrepaciente }}</td>
+                    
+                    <td>
+                        {{ t.tratamientos.all|join:" - " }}
+                    </td>
+
                     <td>
                         {%if t.pagado %}
                             <i class="fas fa-fw fa-check-circle"></i>
@@ -118,6 +124,7 @@ function actualizarVista(data) {
             <tr>
                 <td>${p.fecha_hora}</td>
                 <td>${p.nombrepaciente}</td>
+                <td>${p.tratamientos}</td>
                 <td>${iconito}</td>
                 <td>${p.cosmetologa}</td>
                 <td>

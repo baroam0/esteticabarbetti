@@ -14079,7 +14079,6 @@
  5537;Delgado Yanina;27/07/1990;;;;I Juarez;;; 3704 703878;;;;;
  5536;Delgado Yamila;08/01/1994;;;;Lag Yema;;; 3704 233585;;;;;
  5535;Delgado Vicente;15/12/1993;;;;Ibarreta;;; 3718 457255;;;;;
- 5534;Delgado Sol ;24/06/1995;;;;Chubut 3715 ;;; 3704 951423;;;;;
  5533;Delgado Silvina;22/11/1988;;;;Belgrano 1422;;; 3572 439647;;;;;
  5532;Delgado Silvia;13/11/1957;;;;B Venezuela ;;; 3704 722492;;;;;
  5531;Delgado Sandro;08/04/1971;;;;Las Lomitas ;;; 3704 207730;;;;;
@@ -16721,7 +16720,6 @@
  2895;Bobadilla Victoria;10/04/2007;;;;P Gomez 1698;;; 3704 007176;;;;;
  2894;Bobadilla THiago;15/04/2014;;;;Bosh 50;;; 3705 063026;;;;;
  2893;Bobadilla Silva Martina;09/11/2010;;;;B 2/4;;; 3704 023257;;;;;
- 2892;Bobadilla Sergio Marcelo ;06/08/1975;;;;Clorinda;;; 3718 457303;;;;;
  2891;Bobadilla Sergio;20/10/1985;;;;B Coluccio;;; 3718 449726;;;;;
  2890;Bobadilla Santiago;26/05/2001;;;;San Agustin ;;;3704 081110;;;;;
  2889;Bobadilla Ruth;22/02/1980;;;;Eva Peron 1715;;; 3704 258623;;;;;
@@ -17414,8 +17412,7 @@
  2202;Barrios Andrea;24/12/1991;;;;Lelong 2045 ;;; 3704 952803;;;;;
  2201;Barrios Analia;19/08/1986;;;;Etchegaray 948;;; 3704 809555;;;;;
  2200;Barrios Alfredo;20/02/1987;;;;Danieri 1330;;; 3704 629083;;;;;
- 2199;Barrios Alejandro Ramon;24/11/1980;;;;Laishi;;; 3704 552718;;;;;
- 2198;Barrios Alejandro ;02/02/2010;;;;B Cono Sur;;; 3704 378924;;;;;
+  2198;Barrios Alejandro ;02/02/2010;;;;B Cono Sur;;; 3704 378924;;;;;
  2197;Barrios Agustina;19/06/2017;;;;Villa Lourdes;; IASEP; 3704 001075;;;;;
  2196;Barrios Adriel;22/01/2003;;;;Barrio 2 de;vv;; 3704 828917;;;;;
  2195;Barrionuevo Mirta ;27/03/2049 ;;; 75; B La Paz;;; 3704 307334;;;;;
