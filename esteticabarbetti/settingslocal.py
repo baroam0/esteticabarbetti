@@ -39,7 +39,9 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'cosmiatras',
     'historiasclinicas',
+    'ingresos',
     'pacientes',
+    'productos',
     'tratamientos',
     'turnos'
 ]

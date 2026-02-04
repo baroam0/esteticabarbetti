@@ -25,6 +25,7 @@
                     <th>Fecha </th>
                     <th>Paciente</th>
                     <th>Tratamientos</th>
+                    <th>Observaciones</th>
                     <th>Pagado</th>
                     <th>Cosmiatra</th>
                     <th>Turno</th>
@@ -38,6 +39,15 @@
                     
                     <td>
                         {{ t.tratamientos.all|join:" - " }}
+                    </td>
+
+                    <td>
+                        {% if t.observaciones %}
+                            {{ t.observaciones }}
+                        {%else%}
+                            &nbsp;
+                        {%endif%}
+                        
                     </td>
 
                     <td>
@@ -125,6 +135,7 @@ function actualizarVista(data) {
                 <td>${p.fecha_hora}</td>
                 <td>${p.nombrepaciente}</td>
                 <td>${p.tratamientos}</td>
+                <td>${p.observaciones}</td>
                 <td>${iconito}</td>
                 <td>${p.cosmetologa}</td>
                 <td>
