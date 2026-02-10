@@ -31,45 +31,26 @@
 
                 <!-- Imágenes existentes (solo en edición) -->
 
-
                 {% if accion == "Editar" and imagenes_existentes %}
                     <h5 class="mt-4"><i class="fas fa-images"></i> Imágenes existentes</h5>
                     <div class="d-flex flex-wrap">
-
-                    {% for img in imagenes_existentes %}
-                        {% with img.imagen.url as file_url %}
+                        {% for img in imagenes_existentes %}
                             <div class="card m-2" style="width: 160px;">
                                 <div class="card-body text-center p-2">
+                                    <img src="{{ img.imagen.url }}" 
+                                         class="img-fluid img-thumbnail"
+                                         style="max-height:150px; cursor:pointer;"
+                                         onclick="abrirModal('{{ img.imagen.url }}')">
 
-                                    {% if ".mov" in file_url|lower or ".mp4" in file_url|lower %}
-                            
-                                        <video class="img-thumbnail" style="max-height:150px;" controls>
-                                            <source src="{{ file_url }}" type="video/mp4">
-                                            Tu navegador no soporta videos.
-                                        </video>
-
-                                    {% else %}
-                            
-                            
-                                        <img src="{{ file_url }}" 
-                                        class="img-fluid img-thumbnail"
-                                        style="max-height:150px; cursor:pointer;"
-                                        onclick="abrirModal('{{ file_url }}')">
-
-                                    {% endif %}
-
-                                    <button type="button" class="btn btn-danger btn-sm mt-2"
-                                        onclick="eliminarImagen({{ img.pk }})">
+                                    <button type="button" class="btn btn-danger btn-sm" onclick="eliminarImagen({{ img.pk }})">
                                         <i class="fas fa-trash"></i>
                                     </button>
-
                                 </div>
                             </div>
-                        {% endwith %}
-                    {% endfor %}
+                        {% endfor %}
                     </div>
                 {% endif %}
-
+                
                 <h5 class="mt-4"><i class="fas fa-upload"></i> Subir nuevas imágenes</h5>
 
                 <input id="id_imagenes" type="file" name="imagenes[]" multiple>
