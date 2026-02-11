@@ -24,7 +24,7 @@ class ReporteCosmiatraForm(forms.Form):
                 'class': 'form-control'
             }
         )
-    )
+    )    
 
     cosmiatra = forms.ModelChoiceField(
         queryset=Cosmetologa.objects.all(), 
@@ -34,6 +34,18 @@ class ReporteCosmiatraForm(forms.Form):
             attrs={'class': 'form-control'}
         )
         
+    )
+
+    turno = forms.ChoiceField(
+        required=True, 
+        choices=[
+            ('manana', 'Turno Mañana'), 
+            ('tarde', 'Turno Tarde'),
+            ('todo', 'Todo el dia')
+        ], 
+        widget=forms.Select(
+            attrs={'class': 'form-control'} 
+            ) 
     )
     
     porcentaje = forms.DecimalField(

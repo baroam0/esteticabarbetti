@@ -30,6 +30,11 @@
         </div>
 
         <div class="form-group">
+          <label for="{{ form.cosmiatra.id_turno }}">Turno</label>
+          {{ form.turno }}
+        </div>        
+
+        <div class="form-group">
           <label for="{{ form.porcentaje.id_for_label }}">Porcentaje</label>
           {{ form.porcentaje }}
         </div>
@@ -50,6 +55,7 @@
                     <th>Paciente</th>
                     <th>Tratamientos</th>
                     <th>Productos</th>
+                    <th>Observaciones</th>
                     <th>Monto</th>
                     <th>Porcentaje</th>
                 </tr>
@@ -62,6 +68,7 @@
                 <td>{{ t.paciente }}</td>
                 <td>{{ t.tratamiento }}</td>
                 <td>{{ t.producto }}</td>
+                <td>{{ t.observaciones|default:"" }}</td>
                 <td> $ {{ t.monto }}</td>
                 <td>{{ porcentaje }}%</td>
               </tr>
