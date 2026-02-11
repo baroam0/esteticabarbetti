@@ -39,15 +39,20 @@ def listar_turnos(request):
 def buscar_turnos(request):
     parametro = request.GET.get('q', '')
     page_number = request.GET.get('page', 1)
+        
 
     if parametro:
-
-        turnos = Turno.objects.filter( 
-            Q(nombrepaciente__icontains=parametro) | 
-            Q(cosmetologa__nombre__icontains=parametro) | 
-            Q(cosmetologa__apellido__icontains=parametro) 
-        ).order_by("pagado", "-fecha_hora")
-
+        if parametro.isdigit():
+            turnos = Turno.objects.filter( 
+                numerodocumento__icontains=parametro
+            ).order_by("pagado", "-fecha_hora")
+        else:
+            print("Pasa por string")
+            turnos = Turno.objects.filter( 
+                Q(nombrepaciente__icontains=parametro) | 
+                Q(cosmetologa__nombre__icontains=parametro) | 
+                Q(cosmetologa__apellido__icontains=parametro) 
+            ).order_by("pagado", "-fecha_hora")
     else:
         turnos = Turno.objects.all().order_by("-fecha_hora")
 
