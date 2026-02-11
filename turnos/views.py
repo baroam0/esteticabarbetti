@@ -19,6 +19,48 @@ from .forms import TurnoForm, TurnoProductoFormSet
 
 from cosmiatras.models import Cosmetologa
 from productos.models import HistorialProducto
+from turnos.models import Turno
+
+
+@login_required
+def listar_tratamientos(request, pk): 
+    #Agregado por solicitud de la cosmiatra Jesica Gaetani
+
+    turnoparametro = Turno.objects.get(pk=pk)
+
+    turnos = Turno.objects.filter(
+        numerodocumento=turnoparametro.numerodocumento
+    ).order_by('-fecha_hora') 
+
+    lista_turnos = [] 
+
+    nombrepaciente = ""
+
+    for turno in turnos:
+        productos = TurnoProducto.objects.filter(turno=turno.pk)
+
+        if turno.nombrepaciente:
+            nombrepaciente=turno.nombrepaciente
+
+        lista_turnos.append(
+            {
+                "cosmiatra": turno.cosmetologa,
+                "fecha_hora": turno.fecha_hora, 
+                "tratamiento": " - ".join([t.descripcion for t in turno.tratamientos.all()]),
+                "producto": " - ".join([p.producto.descripcion for p in productos]),
+                "observaciones": turno.observaciones
+            }
+        ) 
+
+    return render(
+        request, 
+        'turnos/lista_tratamientos.html', 
+        {   
+            'turnos': lista_turnos,
+            'nombrepaciente': nombrepaciente
+        }
+    )
+
 
 
 @login_required
@@ -39,7 +81,6 @@ def listar_turnos(request):
 def buscar_turnos(request):
     parametro = request.GET.get('q', '')
     page_number = request.GET.get('page', 1)
-        
 
     if parametro:
         if parametro.isdigit():

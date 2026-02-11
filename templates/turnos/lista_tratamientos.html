@@ -1,0 +1,58 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container-fluid">
+
+    <!-- Encabezado -->
+    <div class="text-center mb-4">
+        <h3 class="h3 text-gray-800">
+            <i class="fas fa-fw fa-hand-holding-medical"></i> Historial Tratamientos Estéticos - {{ nombrepaciente }}
+        </h3>
+    </div>
+
+    <!-- Mensajes -->
+    {% if messages %}
+        {% for message in messages %}
+            <div class="alert alert-{{message.tags}} alert-dismissible fade show" role="alert">
+                {{message}}
+                <button type="button" class="close" data-dismiss="alert" aria-label="Cerrar">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+        {% endfor %}
+    {% endif %}
+
+
+    <div class="table-responsive">
+        <table class="table table-hover table-sm">
+            <thead class="thead-light">
+                <tr>
+                    <th>Fecha</th>
+                    <th>Tratamiento</th>
+                    <th>Productos</th>
+                    <th>Observaciones</th>
+                    <th>Cosmiatra</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for turno in turnos %}
+                <tr>
+                    <td>{{ turno.fecha_hora }}</td>
+                    <td>
+                        {{ turno.tratamiento }}
+                    </td>
+                    <td>
+                        {{ turno.producto }}
+                    </td>
+                    <td>
+                        {{ turno.observaciones|default:"" }}
+                    </td>
+                    <td>{{ turno.cosmiatra }} </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}
+

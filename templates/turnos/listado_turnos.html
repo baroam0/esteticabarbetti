@@ -5,7 +5,7 @@
 
     <!-- Encabezado -->
     <div class="text-center mb-4">
-        <h3 class="h3 text-gray-800">Listado de turnos</h3>
+        <h3 class="h3 text-gray-800">Buscador de turnos</h3>
     </div>
 
     <!-- Buscador -->
@@ -29,6 +29,7 @@
                     <th>Pagado</th>
                     <th>Cosmiatra</th>
                     <th>Turno</th>
+                    <th>Historial</th>
                 </tr>
             </thead>
             <tbody id="tbodyTurnos">
@@ -61,6 +62,12 @@
                     <td>
                         <button type="button" class="btn btn-outline-success btn-sm" onclick="location.href='/turnos/editar/{{ t.pk }}'">
                             <i class="fas fa-fw fa-address-book"></i>
+                        </button>
+                    </td>
+                    <td>
+                        <button type="button" class="btn btn-outline-secondary btn-sm" 
+                                onclick="location.href='/turnos/tratamientos/historial/{{ t.pk }}'">
+                            <i class="fas fa-history"></i>
                         </button>
                     </td>
                 </tr>
@@ -141,6 +148,12 @@ function actualizarVista(data) {
                 <td>
                     <button type="button" class="btn btn-outline-secondary btn-sm" onclick="location.href='/turnos/editar/${p.pk}'">
                         <i class="fas fa-fw fa-address-book"></i>
+                    </button>
+                </td>
+                <td>
+                    <button type="button" class="btn btn-outline-secondary btn-sm" 
+                            onclick="location.href='/turnos/tratamientos/historial/${p.pk}'">
+                        <i class="fas fa-history"></i>
                     </button>
                 </td>
             </tr>
