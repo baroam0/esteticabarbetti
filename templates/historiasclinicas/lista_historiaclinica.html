@@ -44,8 +44,19 @@
                 <tr>
                     <td>{{ historiaclinica.fecha }}</td>
                     <td>{{ historiaclinica.historia }}</td>
-                    <td>{{ historiaclinica.diagnostico }}</td>
-                    <td>{{ historiaclinica.tratamiento }}</td>
+                    
+                    {%if historiaclinica.diagnostico %}
+                        <td>{{ historiaclinica.diagnostico }}</td>
+                    {% else %}
+                        <td></td>
+                    {% endif %}
+
+                    {%if historiaclinica.tratamiento %}
+                        <td>{{ historiaclinica.tratamiento }}</td>
+                    {% else %}
+                        <td></td>
+                    {% endif %}
+
                     <td>
                         <button type="button" class="btn btn-outline-secondary btn-sm" 
                                 onclick="location.href='/historiasclinicas/editar/{{ historiaclinica.pk }}'" 
