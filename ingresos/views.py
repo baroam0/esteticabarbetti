@@ -17,6 +17,7 @@ def ingresos_view(request):
         ingreso.fecha = request.POST.get("fecha")
         ingreso.descripcion = request.POST.get("descripcion")
         ingreso.monto = request.POST.get("monto")
+        ingreso.turno = request.POST.get("turno")
         ingreso.usuario = request.user
         ingreso.save()
 
@@ -25,6 +26,7 @@ def ingresos_view(request):
     # --- NUEVOS FILTROS ---
     fecha_desde = request.GET.get("fecha_desde", "")
     fecha_hasta = request.GET.get("fecha_hasta", "")
+    turnofiltro = request.GET.get("turnofiltro")
 
     ingresos_list = Ingreso.objects.filter(usuario=request.user).order_by("-id")
 
@@ -33,6 +35,9 @@ def ingresos_view(request):
 
     if fecha_hasta:
         ingresos_list = ingresos_list.filter(fecha__lte=fecha_hasta)
+    
+    if turnofiltro in ["M", "T"]: 
+        ingresos_list = ingresos_list.filter(turno=turnofiltro)
 
     ingreso_dinero = sum(i.monto for i in ingresos_list if i.monto > 0)
     egreso_dinero = sum(i.monto for i in ingresos_list if i.monto < 0)
@@ -49,6 +54,7 @@ def ingresos_view(request):
         "egreso_dinero": egreso_dinero,
         "fecha_desde": fecha_desde,
         "fecha_hasta": fecha_hasta,
+        "turno": turnofiltro,
     })
 
 # Create your views here.

@@ -12,6 +12,17 @@ class Ingreso(models.Model):
     monto = models.DecimalField(max_digits=10, decimal_places=2)    
     usuario = models.ForeignKey(User, on_delete=models.CASCADE)
 
+    TURNO_CHOICES = (
+        ('M', 'Mañana'),
+        ('T', 'Tarde')
+    )
+
+    turno = models.CharField(
+        max_length=1,
+        choices=TURNO_CHOICES,
+        default='M',null=True
+    )
+
 
     def __str__(self):
         return self.descripcion
