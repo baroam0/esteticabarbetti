@@ -8,6 +8,17 @@
                 <h1 class="h4 text-gray-900">{{ accion }} Paciente</h1>
             </div>
 
+            {% if messages %}
+                {% for message in messages %}
+                <div class="alert alert-{{message.tags}} alert-dismissible fade show" role="alert">
+                {{message}}
+                <button type="button" class="close" data-dismiss="alert" aria-label="Cerrar">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+                </div>
+                {% endfor %}
+            {% endif %}
+
             <form method="POST" enctype="multipart/form-data">
                 {% csrf_token %}
 
@@ -92,6 +103,19 @@
                         </button>
                     </div>
                 </div>
+
+                {%if pk%}
+
+                <div class="form-row mt-4">
+                    <div class="col-md-12 mb-12">
+                        <button type="button" class="btn btn-info btn-block" onclick="IrHC()">
+                            <i class="fas fa-comment-medical"></i>
+                            Historia Clinica
+                        </button>
+                    </div>
+                </div>
+
+                {%endif%}
             </form>
         </div>
     </div>
@@ -101,6 +125,14 @@
 
 {% block js %}
 <script>
+    {%if pk%}
+        function IrHC() {
+            window.location.replace("/historiasclinicas/lista/" + {{pk}});
+        }
+    {%endif%}
+    
+    
+
     function Volver() {
         window.location.replace("/pacientes/lista");
     }

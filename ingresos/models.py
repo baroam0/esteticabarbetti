@@ -23,9 +23,8 @@ class Ingreso(models.Model):
         default='M',null=True
     )
 
-
     def __str__(self):
-        return self.descripcion
+        return str(self.pk)
 
     class Meta:
         verbose_name = "Ingreso"
