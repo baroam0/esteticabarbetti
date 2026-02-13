@@ -2,12 +2,14 @@
 from django.core.paginator import Paginator
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
+from django.urls import reverse
 from django.http import JsonResponse
 from django.shortcuts import render, redirect, get_object_or_404
 
 
 from .forms import PacienteForm
 from .models import Paciente
+from historiasclinicas.models import HistoriaClinica
 
 
 @login_required
@@ -97,5 +99,28 @@ def editar_paciente(request, pk):
         'pk': pk
     }
     return render(request, 'pacientes/crear_paciente.html', context)
+
+
+def eliminar_paciente(request, pk):
+    paciente = Paciente.objects.get(pk=pk)
+    historiaclinica = HistoriaClinica.objects.filter(paciente=paciente)
+
+    if request.method == "POST":
+        historiaclinica.delete()
+        paciente.delete()
+        return redirect(
+            reverse(
+                "listar_pacientes"
+            )
+        )
+
+    return render(
+        request, 
+        "pacientes/eliminar_paciente.html", 
+        {
+            "historiaclinica": historiaclinica,
+            "paciente": paciente
+        }
+    )
 
 # Create your views here.

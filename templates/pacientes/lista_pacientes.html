@@ -41,6 +41,7 @@
                     <th>Domicilio</th>
                     <th>Editar Paciente</th>
                     <th>Historia Clinica</th>
+                    <th>Eliminar</th>
                 </tr>
             </thead>
             <tbody id="tbodyPacientes">
@@ -58,6 +59,13 @@
                     <td>
                         <button type="button" class="btn btn-outline-success btn-sm" onclick="location.href='/historiasclinicas/lista/{{ paciente.pk }}'">
                             <i class="fas fa-comment-medical"></i>
+                        </button>
+                    </td>
+                    <td>
+                        <button type="button" class="btn btn-danger btn-sm" 
+                                onclick="location.href='/pacientes/eliminar/{{ paciente.pk }}'" 
+                                title="Editar">
+                            <i class="fas fa-trash"></i>
                         </button>
                     </td>
                 </tr>
@@ -134,6 +142,14 @@ function actualizarVista(data) {
                 <td>
                     <button type="button" class="btn btn-outline-success btn-sm" onclick="location.href='/historiasclinicas/lista/${p.id} '">
                         <i class="fas fa-comment-medical"></i>
+                    </button>
+                </td>
+
+                <td>
+                    <button type="button" class="btn btn-danger btn-sm" 
+                            onclick="location.href='/pacientes/eliminar/${p.id}'" 
+                            title="Editar">
+                        <i class="fas fa-trash"></i>
                     </button>
                 </td>
             </tr>
