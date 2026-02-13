@@ -37,6 +37,7 @@
                     <th>Diagnóstico</th>
                     <th>Tratamiento</th>
                     <th>Editar</th>
+                    <th>Eliminar</th>
                 </tr>
             </thead>
             <tbody>
@@ -62,6 +63,14 @@
                                 onclick="location.href='/historiasclinicas/editar/{{ historiaclinica.pk }}'" 
                                 title="Editar">
                             <i class="fas fa-pencil-alt"></i>
+                        </button>
+                    </td>
+
+                    <td>
+                        <button type="button" class="btn btn-danger btn-sm" 
+                                onclick="location.href='/historiasclinicas/eliminar/{{ historiaclinica.pk }}'" 
+                                title="Editar">
+                            <i class="fas fa-trash"></i>
                         </button>
                     </td>
                 </tr>

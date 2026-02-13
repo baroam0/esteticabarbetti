@@ -2,6 +2,7 @@
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import get_object_or_404, render, redirect
 from django.http import JsonResponse
+from django.urls import reverse
 
 from pacientes.models import Paciente
 from .forms import HistoriaClinicaForm, ImagenMultipleForm
@@ -151,6 +152,18 @@ def eliminar_imagen(request, pk):
         print(request.POST)
         ImagenHistoriaClinica.objects.filter(pk=pk).delete()
         return JsonResponse({"ok": True})
+
+
+def eliminar_historiaclinica(request, pk):
+    historiaclinica = get_object_or_404(HistoriaClinica, pk=pk)
+
+    if request.method == "POST":
+        historiaclinica.delete()
+        #return redirect(reverse("listar_historiasclinicas"))
+        return redirect(reverse("listar_historiasclinicas", args=[historiaclinica.paciente.id]))
+
+
+    return render(request, "historiasclinicas/eliminar_historiaclinica.html", {"historiaclinica": historiaclinica})
 
 
 # Create your views here.
