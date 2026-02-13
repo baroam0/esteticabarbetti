@@ -49,7 +49,7 @@ def buscar_pacientes(request):
         "id": p.pk,
         "nombre": p.nombre,
         "edad": p.edad(),
-        "domicilio": p.domicilio
+        "dni": p.numerodocumento or ""
     } for p in page_obj]
 
     return JsonResponse({
