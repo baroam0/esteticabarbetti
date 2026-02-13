@@ -156,14 +156,25 @@ def eliminar_imagen(request, pk):
 
 def eliminar_historiaclinica(request, pk):
     historiaclinica = get_object_or_404(HistoriaClinica, pk=pk)
+    imagenhistoriaclinica = ImagenHistoriaClinica.objects.filter(historiaclinica=historiaclinica.pk)
 
     if request.method == "POST":
         historiaclinica.delete()
-        #return redirect(reverse("listar_historiasclinicas"))
-        return redirect(reverse("listar_historiasclinicas", args=[historiaclinica.paciente.id]))
+        return redirect(
+            reverse(
+                "listar_historiasclinicas", 
+                args=[historiaclinica.paciente.id]
+            )
+        )
 
-
-    return render(request, "historiasclinicas/eliminar_historiaclinica.html", {"historiaclinica": historiaclinica})
+    return render(
+        request, 
+        "historiasclinicas/eliminar_historiaclinica.html", 
+        {
+            "historiaclinica": historiaclinica,
+            "imagenhistoriaclinica":imagenhistoriaclinica
+        }
+    )
 
 
 # Create your views here.

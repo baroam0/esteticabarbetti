@@ -34,6 +34,13 @@
                         Tratamiento: {{ historiaclinica.tratamiento|default:"" }}
                     </h6>
 
+                    {% if imagenhistoriaclinica%}
+                        <h6 class="text-dark font-weight-bold">
+                            Esta Historia Clinica poseee imagenes o videos.
+                        </h6>
+                    
+                    {%endif%}
+
                     <p class="text-muted">
                         Esta acción no se puede deshacer.
                     </p>

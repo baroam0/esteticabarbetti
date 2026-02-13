@@ -21,7 +21,6 @@ class HistoriaClinica(models.Model):
         return str(self.pk)
 
     def save(self, *args, **kwargs):
-        # Si la fecha está vacía o nula, asignamos la fecha y hora actual
         if not self.fecha:
             self.fecha = timezone.now()
         super().save(*args, **kwargs)
@@ -38,7 +37,6 @@ class ImagenHistoriaClinica(models.Model):
     imagen = models.ImageField(upload_to='historias_clinicas/')
 
     def __str__(self):
-        #return f"Imagen de {self.historiaclinica.diagnostico}"
         return str(self.historiaclinica.pk)
 
 
