@@ -188,7 +188,7 @@ def unificar_proceso_paciente(request):
 
         pacienteasimilar.delete()
 
-        return JsonResponse({"message": f"Pacientes unificados: BASE {base_id} ← ASIMILAR {asimilar_id}"})
+        return JsonResponse({"message": f"Pacientes unificados"})
 
     return JsonResponse({"error": "Método no permitido"}, status=405)
 
