@@ -5,7 +5,7 @@ from django.db import models
 
 
 class Ingreso(models.Model):
-    fecha = models.DateField(blank=False, null=False)
+    fecha = models.DateTimeField(blank=False, null=False)
     descripcion = models.TextField(
         max_length=500, null=False, blank=False
     )

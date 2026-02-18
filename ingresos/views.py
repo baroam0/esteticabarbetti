@@ -1,5 +1,5 @@
 
-from datetime import date
+from datetime import datetime, time
 from django.core.paginator import Paginator
 from django.shortcuts import redirect, render, get_object_or_404
 from .models import Ingreso
@@ -17,7 +17,7 @@ def ingresos_view(request):
         ingreso.fecha = request.POST.get("fecha")
         ingreso.descripcion = request.POST.get("descripcion")
         ingreso.monto = request.POST.get("monto")
-        ingreso.turno = request.POST.get("turno")
+        #ingreso.turno = request.POST.get("turno")
         ingreso.usuario = request.user
         ingreso.save()
 
@@ -30,14 +30,28 @@ def ingresos_view(request):
 
     ingresos_list = Ingreso.objects.filter(usuario=request.user).order_by("-id")
 
-    if fecha_desde:
-        ingresos_list = ingresos_list.filter(fecha__gte=fecha_desde)
-
-    if fecha_hasta:
-        ingresos_list = ingresos_list.filter(fecha__lte=fecha_hasta)
+    if fecha_desde: 
+        fecha_desde_dt = datetime.combine(
+            datetime.strptime(fecha_desde, "%Y-%m-%d").date(), 
+            time.min
+        ) 
+        ingresos_list = ingresos_list.filter(fecha__gte=fecha_desde_dt) 
     
-    if turnofiltro in ["M", "T"]: 
-        ingresos_list = ingresos_list.filter(turno=turnofiltro)
+    if fecha_hasta: 
+        fecha_hasta_dt = datetime.combine( 
+            datetime.strptime(fecha_hasta, "%Y-%m-%d").date(), 
+            time.max
+        ) 
+        ingresos_list = ingresos_list.filter(fecha__lte=fecha_hasta_dt) 
+
+    if turnofiltro == "M": 
+        ingresos_list = ingresos_list.filter( 
+            fecha__hour__gte=6, fecha__hour__lt=13 
+        ) 
+    elif turnofiltro == "T": 
+        ingresos_list = ingresos_list.filter( 
+            fecha__hour__gte=13, fecha__hour__lt=23 
+        )
 
     ingreso_dinero = sum(i.monto for i in ingresos_list if i.monto > 0)
     egreso_dinero = sum(i.monto for i in ingresos_list if i.monto < 0)
