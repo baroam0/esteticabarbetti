@@ -9,56 +9,59 @@ from productos.models import Producto
 from .forms import ReporteCosmiatraForm, ReporteProductoForm
 
 
+
 def reporte_cosmiatra(request):
     form = ReporteCosmiatraForm(request.GET or None)
 
-    turnos=""
-    total=""
-    comision=""
-    porcentaje=""
     lista_turnos = []
-    
-    if form.is_valid():
-        fecha_desde = form.cleaned_data.get("fecha_desde")
-        fecha_hasta = form.cleaned_data.get("fecha_hasta")
-        cosmiatra = form.cleaned_data.get("cosmiatra")
-        porcentaje = form.cleaned_data.get("porcentaje")
-        turno = form.cleaned_data.get("turno")
-           
-        cosmetologa = Cosmetologa.objects.get(pk=cosmiatra.pk)
+    total = 0
+    comision = 0
+    porcentaje = ""
 
-        if turno=="manana":
-            fecha_desde = datetime.combine(fecha_desde, time(6, 0)) 
+    if form.is_valid():
+        fecha_desde = form.cleaned_data["fecha_desde"]
+        fecha_hasta = form.cleaned_data["fecha_hasta"]
+        cosmiatra = form.cleaned_data["cosmiatra"]   # instancia o None
+        porcentaje = form.cleaned_data["porcentaje"]
+        turno = form.cleaned_data["turno"]
+
+        # Rango horario
+        if turno == "manana":
+            fecha_desde = datetime.combine(fecha_desde, time(6, 0))
             fecha_hasta = datetime.combine(fecha_hasta, time(13, 0))
-        elif turno=="tarde":
-            fecha_desde = datetime.combine(fecha_desde, time(13, 0)) 
+        elif turno == "tarde":
+            fecha_desde = datetime.combine(fecha_desde, time(13, 0))
             fecha_hasta = datetime.combine(fecha_hasta, time(22, 0))
         else:
-
-            fecha_hasta = datetime.combine(fecha_hasta, datetime.max.time()) 
             fecha_desde = datetime.combine(fecha_desde, datetime.min.time())
+            fecha_hasta = datetime.combine(fecha_hasta, datetime.max.time())
 
-        turnos = Turno.objects.filter( 
-            fecha_hora__range=(fecha_desde, fecha_hasta), 
-            cosmetologa=cosmetologa, pagado=True
-        ).order_by("-fecha_hora")
+        # Query base: TODOS los turnos pagados en rango
+        turnos = Turno.objects.filter(
+            fecha_hora__range=(fecha_desde, fecha_hasta),
+            pagado=True
+        )
 
-        total = 0
+        # Si eligió una cosmiatra específica, filtramos
+        if cosmiatra is not None:
+            turnos = turnos.filter(cosmetologa=cosmiatra)
 
+        turnos = turnos.order_by("-fecha_hora")
+
+        # Procesar turnos
         for turno in turnos:
-            total = total + turno.monto
+            total += turno.monto
             productos = TurnoProducto.objects.filter(turno=turno.pk)
 
-            lista_turnos.append(
-                {
-                    "fecha": turno.fecha_hora,
-                    "monto": turno.monto,
-                    "paciente": turno.nombrepaciente.upper(),
-                    "producto": " - ".join([p.producto.descripcion for p in productos]),
-                    "tratamiento": " - ".join([t.descripcion for t in turno.tratamientos.all()]),
-                    "observaciones": turno.observaciones
-                }
-            ) 
+            lista_turnos.append({
+                "fecha": turno.fecha_hora,
+                "monto": turno.monto,
+                "paciente": turno.nombrepaciente.upper(),
+                "cosmiatra": turno.cosmetologa,
+                "producto": " - ".join([p.producto.descripcion for p in productos]),
+                "tratamiento": " - ".join([t.descripcion for t in turno.tratamientos.all()]),
+                "observaciones": turno.observaciones
+            })
 
         comision = total * porcentaje / 100
 
@@ -73,6 +76,9 @@ def reporte_cosmiatra(request):
             "porcentaje": porcentaje
         }
     )
+
+
+
 
 
 def reporte_productos(request):

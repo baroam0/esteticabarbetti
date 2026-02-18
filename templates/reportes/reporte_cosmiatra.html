@@ -1,4 +1,3 @@
-
 {% extends 'base.html' %}
 
 {% block content %}
@@ -53,6 +52,7 @@
                 <tr>
                     <th>Fecha</th>
                     <th>Paciente</th>
+                    <th>Cosmiatra</th>
                     <th>Tratamientos</th>
                     <th>Productos</th>
                     <th>Observaciones</th>
@@ -66,6 +66,7 @@
               <tr>
                 <td>{{ t.fecha|date:"d/m/Y H:i" }}</td>
                 <td>{{ t.paciente }}</td>
+                <td>{{ t.cosmiatra }}</td>
                 <td>{{ t.tratamiento }}</td>
                 <td>{{ t.producto }}</td>
                 <td>{{ t.observaciones|default:"" }}</td>

@@ -19,17 +19,14 @@ def ingresos_view(request):
         ingreso.monto = request.POST.get("monto")
         ingreso.usuario = request.user
         ingreso.save()
-
         return redirect("ingresos")
 
-    # --- FILTROS ---
     fecha_desde = request.GET.get("fecha_desde", "")
     fecha_hasta = request.GET.get("fecha_hasta", "")
     turnofiltro = request.GET.get("turnofiltro", "A")
 
     ingresos_list = Ingreso.objects.filter(usuario=request.user).order_by("-id")
 
-    # Convertir fecha_desde a datetime
     if fecha_desde:
         fecha_desde_dt = datetime.combine(
             datetime.strptime(fecha_desde, "%Y-%m-%d").date(),
@@ -37,7 +34,6 @@ def ingresos_view(request):
         )
         ingresos_list = ingresos_list.filter(fecha__gte=fecha_desde_dt)
 
-    # Convertir fecha_hasta a datetime
     if fecha_hasta:
         fecha_hasta_dt = datetime.combine(
             datetime.strptime(fecha_hasta, "%Y-%m-%d").date(),
@@ -45,7 +41,6 @@ def ingresos_view(request):
         )
         ingresos_list = ingresos_list.filter(fecha__lte=fecha_hasta_dt)
 
-    # FILTRO POR HORARIO SEGÚN TURNO
     if turnofiltro == "M":
         ingresos_list = ingresos_list.filter(
             fecha__hour__gte=6,

@@ -1,4 +1,6 @@
 
+import json
+
 from django.core.paginator import Paginator
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
@@ -122,5 +124,74 @@ def eliminar_paciente(request, pk):
             "paciente": paciente
         }
     )
+
+
+def unificar_paciente(request):
+    return render(request, 'pacientes/unificar_paciente.html')
+
+
+def unificar_buscar_pacientes(request):
+    parametro = request.GET.get('q', '')
+    page_number = request.GET.get('page', 1)
+
+    if parametro:
+        if parametro.isdigit():
+            pacientes = Paciente.objects.filter(
+                numerodocumento__icontains=parametro
+            ).order_by("nombre")
+        else:
+            pacientes = Paciente.objects.filter(
+                nombre__icontains=parametro
+            ).order_by("nombre")
+    else:
+        pacientes = Paciente.objects.all().order_by("nombre")
+
+    paginator = Paginator(pacientes, 10)
+    page_obj = paginator.get_page(page_number)
+
+    data = [{
+        "id": p.pk,
+        "nombre": p.nombre,
+        "edad": p.edad(),
+        "sexo": p.sexo,
+        "dni": p.numerodocumento or "",
+        "fechanacimiento": p.fechanacimiento or ""
+    } for p in page_obj]
+
+    return JsonResponse({
+        "results": data,
+        "page": page_obj.number,
+        "total_pages": paginator.num_pages,
+        "has_next": page_obj.has_next(),
+        "has_previous": page_obj.has_previous(),
+        "next_page": page_obj.next_page_number() if page_obj.has_next() else None,
+        "prev_page": page_obj.previous_page_number() if page_obj.has_previous() else None,
+    })
+
+
+
+def unificar_proceso_paciente(request):
+    if request.method == "POST":
+        data = json.loads(request.body)
+
+        base_id = data.get("base_id")
+        asimilar_id = data.get("asimilar_id")
+
+        pacientebase = Paciente.objects.get(pk=base_id)
+        pacienteasimilar = Paciente.objects.get(pk=asimilar_id)
+
+        historiasclinicas = HistoriaClinica.objects.filter(paciente=pacienteasimilar)
+
+        for hc in historiasclinicas:
+            hc.paciente=pacientebase
+            hc.save()
+
+        pacienteasimilar.delete()
+
+        return JsonResponse({"message": f"Pacientes unificados: BASE {base_id} ← ASIMILAR {asimilar_id}"})
+
+    return JsonResponse({"error": "Método no permitido"}, status=405)
+
+
 
 # Create your views here.

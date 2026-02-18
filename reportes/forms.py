@@ -28,13 +28,11 @@ class ReporteCosmiatraForm(forms.Form):
 
     cosmiatra = forms.ModelChoiceField(
         queryset=Cosmetologa.objects.all(), 
-        required=True,
-        #empty_label="Todos",
-        widget=forms.Select(
-            attrs={'class': 'form-control'}
-        )
-        
+        required=False, 
+        empty_label="Todas", 
+        widget=forms.Select(attrs={'class': 'form-control'}) 
     )
+
 
     turno = forms.ChoiceField(
         required=True, 
@@ -55,7 +53,6 @@ class ReporteCosmiatraForm(forms.Form):
             attrs={'class': 'form-control'}
         )
     )
-
 
 
 class ReporteProductoForm(forms.Form):

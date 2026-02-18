@@ -1,0 +1,315 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container-fluid">
+
+    <!-- Título -->
+    <div class="d-sm-flex align-items-center justify-content-between mb-4">
+        <h1 class="h3 mb-0 text-gray-800">Unificar Paciente</h1>
+    </div>
+
+
+    <div class="input-group">
+        <input class="form-control" id="txtBuscar" name="txtBuscar" placeholder="Apellido o Nombre">
+        <div class="input-group-append">
+            <!--button type="button" class="btn btn-primary" title="Nuevo Producto" onclick="location.href='/pacientes/crear/'">
+                <i class="fas fa-plus"></i>
+            </button-->
+        </div>
+    </div>
+
+    <!-- Tabla 1 -->
+    <div class="row">
+        <div class="col-lg-12">
+            <div class="card shadow mb-4">
+                <div class="card-header py-3 d-flex justify-content-between align-items-center">
+                    <h6 class="m-0 font-weight-bold text-primary">Tabla Superior</h6>
+                </div>
+
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table id="tablePacienteBase" class="table table-bordered table-sm" width="100%" cellspacing="0">
+                            <thead class="thead-light">
+                                <tr>
+                                    <th></th>
+                                    <th>Apellido y Nombre</th>
+                                    <th>Numero Documento</th>
+                                    <th>Sexo</th>
+                                    <th>Fecha Nacimiento</th>
+                                    <th>Edad</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tbodyPacienteBase">
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <!-- Tabla 2 -->
+    <div class="row">
+        <div class="col-lg-12">
+            <div class="card shadow mb-4">
+                <div class="card-header py-3 d-flex justify-content-between align-items-center">
+                    <h6 class="m-0 font-weight-bold text-primary">Tabla Inferior</h6>
+                </div>
+
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table id="tablePacienteAsimilar" class="table table-bordered table-sm" width="100%" cellspacing="0">
+                            <thead class="thead-light">
+                                <tr>
+                                    <th></th>
+                                    <th>Apellido y Nombre</th>
+                                    <th>Numero Documento</th>
+                                    <th>Sexo</th>
+                                    <th>Fecha Nacimiento</th>
+                                    <th>Edad</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tbodyPacienteAsimilar">
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    
+        <div class="text-center mt-6">
+            <button id="btnUnificar" class="btn btn-danger btn-lg">
+                UNIFICAR
+            </button>
+        </div>
+    
+
+</div>
+{% endblock %}
+
+{% block js %}
+<script>
+
+
+document.getElementById("btnUnificar").addEventListener("click", function () {
+    let base = document.querySelector("input[name='paciente_base']:checked");
+    let asimilar = document.querySelector("input[name='paciente_asimilar']:checked");
+
+    if (!base) {
+        alert("Debe seleccionar un paciente BASE en la tabla superior.");
+        return;
+    }
+
+    if (!asimilar) {
+        alert("Debe seleccionar un paciente a ASIMILAR en la tabla inferior.");
+        return;
+    }
+
+    let data = {
+        base_id: base.id,
+        asimilar_id: asimilar.id
+    };
+
+    fetch("/pacientes/unificarpaciente/", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+            "X-CSRFToken": getCookie("csrftoken")
+        },
+        body: JSON.stringify(data)
+    })
+    .then(response => response.json())
+    .then(result => {
+        alert(result.message);
+    })
+    .catch(error => console.error("Error:", error));
+});
+
+// Obtener CSRF token (Django)
+function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== "") {
+        let cookies = document.cookie.split(";");
+        for (let i = 0; i < cookies.length; i++) {
+            let cookie = cookies[i].trim();
+            if (cookie.substring(0, name.length + 1) === (name + "=")) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+}
+
+
+document.addEventListener("change", function (e) {
+    // Solo reaccionamos a radios de la tabla superior
+    if (e.target && e.target.name === "paciente_base") {
+
+        let fila = e.target.closest("tr");
+        let perteneceATablaSuperior = fila.closest("#tbodyPacienteBase") !== null;
+
+        if (!perteneceATablaSuperior) {
+            return;
+        }
+
+        let idSeleccionado = e.target.id;
+
+        // Al seleccionar un radio en la tabla superior → eliminar de la inferior
+        let filas = document.querySelectorAll("#tbodyPacienteAsimilar tr");
+
+        filas.forEach(fila => {
+            let radio = fila.querySelector("input[type='radio']");
+            if (radio && radio.id === idSeleccionado) {
+                fila.remove();
+            }
+        });
+
+        // Si se deselecciona (solo posible si se selecciona otro radio)
+        // → volver a agregar todos los que no estén seleccionados
+        let radiosSeleccionados = document.querySelectorAll("input[name='paciente_base']:checked");
+        let idActual = radiosSeleccionados.length ? radiosSeleccionados[0].id : null;
+
+        // Regenerar tabla inferior desde tabla superior
+        let tbodyInferior = document.getElementById("tbodyPacienteAsimilar");
+        tbodyInferior.innerHTML = "";
+
+        document.querySelectorAll("#tbodyPacienteBase tr").forEach(filaSup => {
+            let radioSup = filaSup.querySelector("input[type='radio']");
+            if (radioSup && radioSup.id !== idActual) {
+                let celdas = filaSup.querySelectorAll("td");
+
+                tbodyInferior.innerHTML += `
+                    <tr>
+                        <td><input type="radio" id="${radioSup.id}" name="paciente_asimilar"></td>
+                        <td>${celdas[1].innerText}</td>
+                        <td>${celdas[2].innerText}</td>
+                        <td>${celdas[3].innerText}</td>
+                        <td>${celdas[4].innerText}</td>
+                        <td>${celdas[5].innerText}</td>
+                    </tr>
+                `;
+            }
+        });
+    }
+});
+
+
+
+function buscarPagina(num) {
+    let query = document.getElementById("txtBuscar").value;
+
+    fetch(`/pacientes/unificarbuscar?q=${query}&page=${num}`)
+        .then(response => response.json())
+        .then(data => actualizarVista(data));
+}
+
+document.getElementById("txtBuscar").addEventListener("keyup", function() {
+    let query = this.value;
+
+    fetch(`/pacientes/unificarbuscar?q=${query}`)
+        .then(response => response.json())
+        .then(data => actualizarVista(data));
+    
+    fetch(`/pacientes/unificarbuscar?q=${query}`)
+        .then(response => response.json())
+        .then(data => actualizarVistaAsimilar(data));
+});
+
+function actualizarVista(data) {
+    let tbody = document.getElementById("tbodyPacienteBase");
+    tbody.innerHTML = "";
+
+    data.results.forEach(p => {
+        tbody.innerHTML += `
+            <tr>
+                <td><input type="radio" id="${p.id}" name="paciente_base"></td>
+                <td>${p.nombre}</td>
+                <td>${p.dni}</td>
+                <td>${p.sexo}</td>
+                <td>${p.fechanacimiento}</td>
+                <td>${p.edad}</td>
+            </tr>
+        `;
+    });
+
+    let pag = document.getElementById("paginacion");
+    pag.innerHTML = "";
+
+    if (data.has_previous) {
+        pag.innerHTML += `
+            <li class="page-item">
+                <a class="page-link" href="#" onclick="buscarPagina(${data.prev_page})">
+                    <i class="fas fa-angle-left"></i>
+                </a>
+            </li>`;
+    }
+
+    pag.innerHTML += `
+        <li class="page-item disabled">
+            <a class="page-link">Pag. ${data.page} de ${data.total_pages}</a>
+        </li>
+    `;
+
+    if (data.has_next) {
+        pag.innerHTML += `
+            <li class="page-item">
+                <a class="page-link" href="#" onclick="buscarPagina(${data.next_page})">
+                    <i class="fas fa-angle-right"></i>
+                </a>
+            </li>`;
+    }
+}
+
+
+function actualizarVistaAsimilar(data) {
+    let tbody = document.getElementById("tbodyPacienteAsimilar");
+    tbody.innerHTML = "";
+
+    data.results.forEach(p => {
+        tbody.innerHTML += `
+            <tr>
+                <td><input type="radio" id="${p.id}" name="paciente_asimilar"></td>
+                <td>${p.nombre}</td>
+                <td>${p.dni}</td>
+                <td>${p.sexo}</td>
+                <td>${p.fechanacimiento}</td>
+                <td>${p.edad}</td>
+            </tr>
+        `;
+    });
+
+    let pag = document.getElementById("paginacion");
+    pag.innerHTML = "";
+
+    if (data.has_previous) {
+        pag.innerHTML += `
+            <li class="page-item">
+                <a class="page-link" href="#" onclick="buscarPagina(${data.prev_page})">
+                    <i class="fas fa-angle-left"></i>
+                </a>
+            </li>`;
+    }
+
+    pag.innerHTML += `
+        <li class="page-item disabled">
+            <a class="page-link">Pag. ${data.page} de ${data.total_pages}</a>
+        </li>
+    `;
+
+    if (data.has_next) {
+        pag.innerHTML += `
+            <li class="page-item">
+                <a class="page-link" href="#" onclick="buscarPagina(${data.next_page})">
+                    <i class="fas fa-angle-right"></i>
+                </a>
+            </li>`;
+    }
+}
+
+</script>
+{% endblock %}
