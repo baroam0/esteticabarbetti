@@ -17,48 +17,42 @@ def ingresos_view(request):
         ingreso.fecha = request.POST.get("fecha")
         ingreso.descripcion = request.POST.get("descripcion")
         ingreso.monto = request.POST.get("monto")
+        #ingreso.turno = request.POST.get("turno")
         ingreso.usuario = request.user
         ingreso.save()
 
         return redirect("ingresos")
 
-    # --- FILTROS ---
+    # --- NUEVOS FILTROS ---
     fecha_desde = request.GET.get("fecha_desde", "")
     fecha_hasta = request.GET.get("fecha_hasta", "")
-    turnofiltro = request.GET.get("turnofiltro", "A")
+    turnofiltro = request.GET.get("turnofiltro")
 
     ingresos_list = Ingreso.objects.filter(usuario=request.user).order_by("-id")
 
-    # Convertir fecha_desde a datetime
-    if fecha_desde:
+    if fecha_desde: 
         fecha_desde_dt = datetime.combine(
-            datetime.strptime(fecha_desde, "%Y-%m-%d").date(),
+            datetime.strptime(fecha_desde, "%Y-%m-%d").date(), 
             time.min
-        )
-        ingresos_list = ingresos_list.filter(fecha__gte=fecha_desde_dt)
-
-    # Convertir fecha_hasta a datetime
-    if fecha_hasta:
-        fecha_hasta_dt = datetime.combine(
-            datetime.strptime(fecha_hasta, "%Y-%m-%d").date(),
+        ) 
+        ingresos_list = ingresos_list.filter(fecha__gte=fecha_desde_dt) 
+    
+    if fecha_hasta: 
+        fecha_hasta_dt = datetime.combine( 
+            datetime.strptime(fecha_hasta, "%Y-%m-%d").date(), 
             time.max
-        )
-        ingresos_list = ingresos_list.filter(fecha__lte=fecha_hasta_dt)
+        ) 
+        ingresos_list = ingresos_list.filter(fecha__lte=fecha_hasta_dt) 
 
-    # FILTRO POR HORARIO SEGÚN TURNO
-    if turnofiltro == "M":
-        ingresos_list = ingresos_list.filter(
-            fecha__hour__gte=6,
-            fecha__hour__lt=13
-        )
-
-    elif turnofiltro == "T":
-        ingresos_list = ingresos_list.filter(
-            fecha__hour__gte=13,
-            fecha__hour__lt=23
+    if turnofiltro == "M": 
+        ingresos_list = ingresos_list.filter( 
+            fecha__hour__gte=6, fecha__hour__lt=13 
+        ) 
+    elif turnofiltro == "T": 
+        ingresos_list = ingresos_list.filter( 
+            fecha__hour__gte=13, fecha__hour__lt=23 
         )
 
-    # Cálculos
     ingreso_dinero = sum(i.monto for i in ingresos_list if i.monto > 0)
     egreso_dinero = sum(i.monto for i in ingresos_list if i.monto < 0)
     saldo = ingreso_dinero + egreso_dinero
@@ -76,3 +70,5 @@ def ingresos_view(request):
         "fecha_hasta": fecha_hasta,
         "turno": turnofiltro,
     })
+
+# Create your views here.
