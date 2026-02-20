@@ -18,9 +18,14 @@ from django.conf import settings
 from django.conf.urls.static import static
 from django.contrib import admin
 from django.urls import include, path
-
+from django.shortcuts import redirect
 
 from .views import home, loginusuario, salir
+
+def redirect_404_to_login(request, exception):
+    return redirect('login')  # o la URL que uses
+
+handler404 = 'esteticabarbetti.urls.redirect_404_to_login'
 
 urlpatterns = [
     path('admin/', admin.site.urls),
