@@ -117,7 +117,8 @@ def buscar_turnos(request):
     data = [
         { 
             "fecha_hora": f"{p.fecha_hora.day} {MESES[p.fecha_hora.month]} {p.fecha_hora.year} {p.fecha_hora.strftime('%H:%M')}", 
-            "nombrepaciente": p.nombrepaciente, 
+            "nombrepaciente": p.nombrepaciente,
+            "numerodocumento": p.numerodocumento,
             "tratamientos": " - ".join([t.descripcion for t in p.tratamientos.all()]), 
             "observaciones": p.observaciones or "",
             "cosmetologa": f"{p.cosmetologa.nombre.upper()}, {p.cosmetologa.apellido.upper()}", 

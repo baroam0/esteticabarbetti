@@ -68,6 +68,22 @@ def buscar_pacientes(request):
 
 @login_required
 def buscar_pacientes_tratamiento(request):
+
+    MESES = { 
+        1: "Enero", 
+        2: "Febrero", 
+        3: "Marzo", 
+        4: "Abril", 
+        5: "Mayo", 
+        6: "Junio", 
+        7: "Julio", 
+        8: "Agosto", 
+        9: "Septiembre", 
+        10: "Octubre", 
+        11: "Noviembre", 
+        12: "Diciembre",
+    }
+
     parametro = request.GET.get('q', '')
     page_number = request.GET.get('page', 1)
 
@@ -75,18 +91,20 @@ def buscar_pacientes_tratamiento(request):
         if parametro.isdigit():
             turnos =  Turno.objects.filter(
                 numerodocumento__icontains=parametro
-            ).order_by("nombrepaciente")
+            ).order_by("-fecha_hora")
         else:
             turnos =  Turno.objects.filter(
                 nombrepaciente__icontains=parametro
-            ).order_by("nombrepaciente")
+            ).order_by("-nombrepaciente")
         paginator = Paginator(turnos, 10)
         page_obj = paginator.get_page(page_number)
 
         data = [{
             "id": p.pk,
             "nombre": p.nombrepaciente,
+            "fecha_hora": f"{p.fecha_hora.day} {MESES[p.fecha_hora.month]} {p.fecha_hora.year} {p.fecha_hora.strftime('%H:%M')}", 
             "dni": p.numerodocumento or "",
+            "tratamientos": " - ".join([t.descripcion for t in p.tratamientos.all()]), 
             "sexo": p.sexo
         } for p in page_obj]
 

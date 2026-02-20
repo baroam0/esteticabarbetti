@@ -24,6 +24,7 @@
                 <tr>
                     <th>Fecha </th>
                     <th>Paciente</th>
+                    <th>DNI</th>
                     <th>Tratamientos</th>
                     <th>Observaciones</th>
                     <th>Pagado</th>
@@ -37,6 +38,7 @@
                 <tr>
                     <td>{{ t.fecha_hora }}</td>
                     <td>{{ t.nombrepaciente }}</td>
+                    <td>{{ t.numerodocumento }}</td>
                     
                     <td>
                         {{ t.tratamientos.all|join:" - " }}
@@ -141,6 +143,7 @@ function actualizarVista(data) {
             <tr>
                 <td>${p.fecha_hora}</td>
                 <td>${p.nombrepaciente}</td>
+                <td>${p.numerodocumento}</td>
                 <td>${p.tratamientos}</td>
                 <td>${p.observaciones}</td>
                 <td>${iconito}</td>
