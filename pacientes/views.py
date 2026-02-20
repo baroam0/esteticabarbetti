@@ -12,6 +12,7 @@ from django.shortcuts import render, redirect, get_object_or_404
 from .forms import PacienteForm
 from .models import Paciente
 from historiasclinicas.models import HistoriaClinica
+from turnos.models import Turno
 
 
 @login_required
@@ -63,6 +64,42 @@ def buscar_pacientes(request):
         "next_page": page_obj.next_page_number() if page_obj.has_next() else None,
         "prev_page": page_obj.previous_page_number() if page_obj.has_previous() else None,
     })
+
+
+@login_required
+def buscar_pacientes_tratamiento(request):
+    parametro = request.GET.get('q', '')
+    page_number = request.GET.get('page', 1)
+
+    if parametro:
+        if parametro.isdigit():
+            turnos =  Turno.objects.filter(
+                numerodocumento__icontains=parametro
+            ).order_by("nombrepaciente")
+        else:
+            turnos =  Turno.objects.filter(
+                nombrepaciente__icontains=parametro
+            ).order_by("nombrepaciente")
+        paginator = Paginator(turnos, 10)
+        page_obj = paginator.get_page(page_number)
+
+        data = [{
+            "id": p.pk,
+            "nombre": p.nombrepaciente,
+            "dni": p.numerodocumento or "",
+            "sexo": p.sexo
+        } for p in page_obj]
+
+
+        return JsonResponse({
+            "results_turnopaciente": data,
+            "page_turnopaciente": page_obj.number,
+            "total_pages_turnopaciente": paginator.num_pages,
+            "has_next_turnopaciente": page_obj.has_next(),
+            "has_previous_turnopaciente": page_obj.has_previous(),
+            "next_page_turnopaciente": page_obj.next_page_number() if page_obj.has_next() else None,
+            "prev_page_turnopaciente": page_obj.previous_page_number() if page_obj.has_previous() else None,
+        })
 
 
 def crear_paciente(request):
@@ -169,29 +206,47 @@ def unificar_buscar_pacientes(request):
     })
 
 
-
 def unificar_proceso_paciente(request):
     if request.method == "POST":
         data = json.loads(request.body)
-
         base_id = data.get("base_id")
         asimilar_id = data.get("asimilar_id")
-
         pacientebase = Paciente.objects.get(pk=base_id)
         pacienteasimilar = Paciente.objects.get(pk=asimilar_id)
-
         historiasclinicas = HistoriaClinica.objects.filter(paciente=pacienteasimilar)
 
         for hc in historiasclinicas:
             hc.paciente=pacientebase
             hc.save()
-
         pacienteasimilar.delete()
-
         return JsonResponse({"message": f"Pacientes unificados"})
-
     return JsonResponse({"error": "Método no permitido"}, status=405)
 
 
+def crear_paciente_precarga(request, pk):
+    if request.method == 'POST':
+        form = PacienteForm(request.POST, request.FILES)
+        if form.is_valid():
+            paciente=form.save()
+            nuevo_id=paciente.id
+            return redirect('listar_historiasclinicas', pk=nuevo_id)
+    else:
+        turno=Turno.objects.get(pk=pk)
+        form = PacienteForm(
+            initial={
+                "nombre": turno.nombrepaciente,
+                "numerodocumento": turno.numerodocumento,
+                'sexo': turno.sexo
+            }
+        )
+
+    return render(
+        request, 
+        'pacientes/crear_paciente.html', 
+        {
+            'form': form, 
+            'accion': 'Nuevo '
+        }
+    )
 
 # Create your views here.

@@ -88,7 +88,6 @@ def buscar_turnos(request):
                 numerodocumento__icontains=parametro
             ).order_by("pagado", "-fecha_hora")
         else:
-            print("Pasa por string")
             turnos = Turno.objects.filter( 
                 Q(nombrepaciente__icontains=parametro) | 
                 Q(cosmetologa__nombre__icontains=parametro) | 

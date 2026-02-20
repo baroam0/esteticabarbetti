@@ -16,5 +16,9 @@ urlpatterns = [
         name='unificar_buscar_pacientes'
     ),
     path('unificarpaciente/', views.unificar_proceso_paciente, name='unificar_proceso_paciente'),
+    path('buscarpacienteturno', views.buscar_pacientes_tratamiento, name='buscar_pacientes_tratamiento'),
+    path('crearprecargar/<int:pk>', views.crear_paciente_precarga, name='crear_paciente_precarga'),
 ]
+
+
 

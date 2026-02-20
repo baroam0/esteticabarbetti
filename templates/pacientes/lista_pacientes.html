@@ -1,11 +1,25 @@
 {% extends 'base.html' %}
 
 {% block content %}
+
+
+<style>
+    #tablaPacientesTurnos tbody tr {
+        background-color: #ffe6f2; /* rosa suave */
+    }
+
+    #tablaPacientesTurnos tbody tr:hover {
+        background-color: #ffccd9 !important; /* rosa un poco más fuerte */
+    }
+</style>
+
+
+
 <div class="container-fluid">
 
     <!-- Encabezado -->
     <div class="text-center mb-4">
-        <h3 class="h3 text-gray-800">Listado de Pacientes</h3>
+        <h4 class="h4 text-gray-800">Listado de Pacientes - Consultorio</h4>
     </div>
 
     <!-- Mensajes -->
@@ -101,6 +115,67 @@
         </ul>
     </nav>
 
+    <div class="text-center mb-4">
+        <h4 class="h4 text-gray-800">Listado de Pacientes - Estetica</h4>
+    </div>
+
+
+
+    <div class="table-responsive">
+        <table class="table table-hover table-sm" id="tablaPacientesTurnos">
+            <thead class="thead-light">
+                <tr>
+                    <th>Apellido y Nombre </th>
+                    <th>DNI</th>
+                    <th>Sexo</th>
+                    <th>Crear</th>
+                </tr>
+            </thead>
+            <tbody id="tbodyPacientesTurno">
+                {% for pacienteturno in resultspacienteturno %}
+                <tr>
+                    <td>{{ pacienteturno.nombre }}</td>
+                    <td>{{ pacienteturno.dni|default:"" }}</td>
+                    <td>{{ pacienteturno.sexo|default:"" }}</td>
+
+                    <td>
+                        <button type="button" class="btn btn-outline-secondary btn-sm" onclick="location.href='/pacientes/editar/{{ paciente.pk }}'">
+                            <i class="fas fa-plus"></i>
+                        </button>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <nav aria-label="Page navigation">
+        <ul class="pagination pagination-sm justify-content-center" id="paginacionPacienteTurno">
+            {% if results_turnopaciente.has_previous %}
+                <li class="page-item">
+                    <a class="page-link" href="?page=1"><i class="fas fa-angle-double-left"></i></a>
+                </li>
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ results_turnopaciente.previous_page_number }}"><i class="fas fa-angle-left"></i></a>
+                </li>
+            {% endif %}
+
+            <li class="page-item disabled">
+                <a class="page-link">Pag. {{ results_turnopaciente.number }} de {{ results_turnopaciente.paginator.num_pages }}</a>
+            </li>
+
+            {% if results_turnopaciente.has_next %}
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ results_turnopaciente.next_page_number }}"><i class="fas fa-angle-right"></i></a>
+                </li>
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ results_turnopaciente.paginator.num_pages }}"><i class="fas fa-angle-double-right"></i></a>
+                </li>
+            {% endif %}
+        </ul>
+    </nav>
+
+
 </div>
 {% endblock %}
 
@@ -115,16 +190,27 @@ function buscarPagina(num) {
         .then(data => actualizarVista(data));
 }
 
+function buscarPaginaPacienteTurno(num) {
+    let query = document.getElementById("txtBuscar").value;
+
+    fetch(`/pacientes/buscarpacienteturno?q=${query}&page=${num}`)
+        .then(response => response.json())
+        .then(data => actualizarVistaPacienteTurno(data));
+}
+
 document.getElementById("txtBuscar").addEventListener("keyup", function() {
     let query = this.value;
 
     fetch(`/pacientes/buscar?q=${query}`)
         .then(response => response.json())
         .then(data => actualizarVista(data));
+    
+    fetch(`/pacientes/buscarpacienteturno?q=${query}`)
+        .then(response => response.json())
+        .then(data => actualizarVistaPacienteTurno(data));
 });
 
 function actualizarVista(data) {
-
     let tbody = document.getElementById("tbodyPacientes");
     tbody.innerHTML = "";
 
@@ -183,6 +269,57 @@ function actualizarVista(data) {
             </li>`;
     }
 }
+
+
+
+function actualizarVistaPacienteTurno(data) {
+    
+    let tbody = document.getElementById("tbodyPacientesTurno");
+    tbody.innerHTML = "";
+
+    data.results_turnopaciente.forEach(p => {
+        tbody.innerHTML += `
+            <tr>
+                <td>${p.nombre}</td>
+                <td>${p.dni}</td>
+                <td>${p.sexo}</td>
+                <td>
+                    <button type="button" class="btn btn-outline-secondary btn-sm" onclick="location.href='/pacientes/crearprecargar/${p.id}'">
+                        <i class="fas fa-plus"></i>
+                    </button>
+                </td>
+            </tr>
+        `;
+    });
+
+    let pag = document.getElementById("paginacionPacienteTurno");
+    pag.innerHTML = "";
+
+    if (data.has_previous_turnopaciente) {
+        pag.innerHTML += `
+            <li class="page-item">
+                <a class="page-link" href="#" onclick="buscarPaginaPacienteTurno(${data.prev_pagepacienteturno})">
+                    <i class="fas fa-angle-left"></i>
+                </a>
+            </li>`;
+    }
+
+    pag.innerHTML += `
+        <li class="page-item disabled">
+            <a class="page-link">Pag. ${data.page_turnopaciente} de ${data.total_pages_turnopaciente}</a>
+        </li>
+    `;
+
+    if (data.has_next_turnopaciente) {
+        pag.innerHTML += `
+            <li class="page-item">
+                <a class="page-link" href="#" onclick="buscarPagina(${data.next_page_turnopaciente})">
+                    <i class="fas fa-angle-right"></i>
+                </a>
+            </li>`;
+    }
+}
+
 
 </script>
 {% endblock %}

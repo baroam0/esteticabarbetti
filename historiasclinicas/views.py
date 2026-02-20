@@ -149,7 +149,6 @@ def editar_historiaclinica(request, pk):
 
 def eliminar_imagen(request, pk):
     if request.method == "POST":
-        print(request.POST)
         ImagenHistoriaClinica.objects.filter(pk=pk).delete()
         return JsonResponse({"ok": True})
 
