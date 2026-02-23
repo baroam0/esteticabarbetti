@@ -1,0 +1,93 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+    <head>
+        <meta charset="UTF-8">
+        <title>Gráfico de Tratamientos</title>
+    </head>
+
+    <div class="container-fluid mt-4">
+        <h1 class="h3 mb-4 text-gray-800">Tratamientos por fechas</h1>
+        <!-- Selector de fecha -->
+        <form method="GET" class="mb-6">
+            <div class="form-row align-items-end">
+
+                <div class="col-auto">
+                    <label for="fecha_desde">Fecha desde:</label>
+                    <input type="date" id="fecha_desde" name="fecha_desde" class="form-control"
+                        value="{{ fecha_desde_str }}">
+                </div>
+
+                <div class="col-auto">
+                    <label for="fecha_hasta">Fecha hasta:</label>
+                    <input type="date" id="fecha_hasta" name="fecha_hasta" class="form-control"
+                    value="{{ fecha_hasta_str }}">
+                </div>
+
+                <div class="col-auto">
+                    <button type="submit" class="btn btn-primary">Generar gráfico</button>
+                </div>
+
+            </div>
+        </form>
+
+
+        {% if fecha_desde_str %}
+            <div class="card shadow mb-4">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-primary">
+                        Tratamientos del día
+                    </h6>
+                </div>
+                <div class="card-body">
+                    {% if labels %}
+                        <canvas id="graficoTorta"></canvas>
+                    {% else %}
+                        <p class="text-muted">No hay tratamientos registrados para esta fecha.</p>
+                    {% endif %}
+                </div>
+            </div>
+        {% endif %}
+
+    </div>
+
+{% endblock %}
+
+
+{%block js%}
+
+    {% if labels %}
+    <script>
+        const labels = {{ labels|safe }};
+        const valores = {{ valores|safe }};
+
+        new Chart(document.getElementById('graficoTorta'), {
+            type: 'pie',
+            data: {
+                labels: labels,
+                datasets: [{
+                    data: valores,
+                    backgroundColor: [
+                        "#4e73df", "#1cc88a", "#36b9cc", "#f6c23e", "#e74a3b", "#858796",
+                        "#2ecc71", "#9b59b6", "#e67e22", "#3498db", "#e74c3c", "#16a085",
+                        "#f39c12", "#d35400", "#7f8c8d", "#27ae60", "#2980b9", "#8e44ad",
+                        "#c0392b", "#f1c40f", "#2c3e50", "#95a5a6", "#34495e", "#1abc9c",
+                        "#ff6384", "#36a2eb", "#cc65fe", "#ffce56", "#6f42c1", "#20c997",
+                        "#6610f2", "#fd7e14", "#dc3545", "#0d6efd", "#198754", "#0dcaf0",
+                        "#adb5bd", "#6c757d", "#ffc107", "#ff5733", "#c70039", "#900c3f",
+                        "#581845", "#ff8d1a", "#ffb347", "#ffcc33", "#b19cd9", "#77dd77",
+                        "#aec6cf", "#f49ac2", "#ffb3ba", "#cfcfc4", "#b0e0e6", "#ff6961",
+                        "#03a9f4", "#009688", "#8bc34a", "#cddc39", "#ffeb3b", "#ffc107",
+                        "#ff9800", "#ff5722", "#795548", "#9e9e9e", "#607d8b", "#3f51b5",
+                        "#673ab7", "#ba68c8", "#4db6ac", "#81c784", "#aed581", "#fff176",
+                        "#ffd54f", "#ffb74d", "#ff8a65"
+                    ]
+                }]
+            }
+        });
+    </script>
+    {% endif %}
+
+{%endblock%}
+

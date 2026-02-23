@@ -1,7 +1,8 @@
+from datetime import datetime, time, timedelta
 
-
-from datetime import datetime, time
+from django.db.models import Count
 from django.shortcuts import render
+from django.utils import timezone
 
 from cosmiatras.models import Cosmetologa
 from turnos.models import Turno, TurnoProducto
@@ -141,6 +142,42 @@ def reporte_productos(request):
             "total": total
         }
     )
+
+
+
+def grafico_tratamientos(request):
+    fecha_desde_str = request.GET.get("fecha_desde")
+    fecha_hasta_str = request.GET.get("fecha_hasta")
+
+    labels = []
+    valores = []
+
+    if fecha_desde_str and fecha_hasta_str:
+        fecha_desde = datetime.strptime(fecha_desde_str, "%Y-%m-%d").date()
+        fecha_hasta = datetime.strptime(fecha_hasta_str, "%Y-%m-%d").date()
+
+        inicio = datetime.combine(fecha_desde, datetime.min.time())
+        fin = datetime.combine(fecha_hasta, datetime.max.time())
+
+        datos = (
+            Turno.objects.filter(fecha_hora__range=(inicio, fin))
+            .values("tratamientos__descripcion")
+            .annotate(total=Count("tratamientos"))
+            .order_by("-total")
+        )
+
+        labels = [item["tratamientos__descripcion"] for item in datos]
+        valores = [item["total"] for item in datos]    
+
+    contexto = {
+        "fecha_desde_str": fecha_desde_str,
+        "fecha_hasta_str": fecha_hasta_str,
+        "labels": labels,
+        "valores": valores,
+    }
+    
+
+    return render(request, "reportes/grafico_tratamientos.html", contexto)
 
 
 # Create your views here.

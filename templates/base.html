@@ -115,19 +115,48 @@
             </li>
 
             {% if user.is_staff %}
+
+
             <li class="nav-item">
+                <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapsePages"
+                    aria-expanded="true" aria-controls="collapsePages">
+                    <i class="fas fa-fw fa-book-open"></i>
+                    <span>Reportes</span>
+                </a>
+                <div id="collapsePages" class="collapse" aria-labelledby="headingPages" data-parent="#accordionSidebar">
+                    <div class="bg-white py-2 collapse-inner rounded">
+                        <a class="collapse-item" href="/reportes/cosmiatras">
+                            <i class="fas fa-fw fa-hospital-user"></i>
+                            Reportes Cosmiatras
+                        </a>
+                        
+                        <a class="collapse-item" href="/reportes/productos">
+                            <i class="fas fa-fw fa-hospital-user"></i>
+                            Reporte Productios
+                        </a>
+
+                        <a class="collapse-item" href="/reportes/graficotratamientos">
+                            <i class="fas fa-fw fa-chart-area"></i>
+                            Grafico Tratamientos
+                        </a>
+            
+                    </div>
+                </div>
+            </li>
+
+            <!--li class="nav-item">
                 <a class="nav-link" href="/reportes/cosmiatras">
                     <i class="fas fa-fw fa-hospital-user"></i>
                     <span>Reportes</span>        
                 </a>
-            </li>
+            </li-->
 
-            <li class="nav-item">
+            <!--li class="nav-item">
                 <a class="nav-link" href="/reportes/productos">
                     <i class="fas fa-fw fa-hospital-user"></i>
                     <span>Reportes Productos</span>        
                 </a>
-            </li>
+            </li-->
             {% endif %}
 
             <li class="nav-item">
@@ -151,6 +180,8 @@
                     <span>Turnos - Buscar</span>
                 </a>
             </li>
+
+            
 
             <li class="nav-item">
                 <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapsePages"
