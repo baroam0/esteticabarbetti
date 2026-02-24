@@ -51,6 +51,7 @@ def buscar_pacientes(request):
     data = [{
         "id": p.pk,
         "nombre": p.nombre,
+        "telefono": p.telefono,
         "edad": p.edad(),
         "dni": p.numerodocumento or ""
     } for p in page_obj]

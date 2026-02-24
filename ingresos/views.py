@@ -52,11 +52,15 @@ def ingresos_view(request):
             fecha__hour__gte=13,
             fecha__hour__lt=23
         )
-
-    # Cálculos
-    ingreso_dinero = sum(i.monto for i in ingresos_list if i.monto > 0)
-    egreso_dinero = sum(i.monto for i in ingresos_list if i.monto < 0)
-    saldo = ingreso_dinero + egreso_dinero
+    
+    if ingresos_list:
+        ingreso_dinero = sum(i.monto for i in ingresos_list if i.monto > 0)
+        egreso_dinero = sum(i.monto for i in ingresos_list if i.monto < 0)
+        saldo = ingreso_dinero + egreso_dinero
+    else:
+        ingreso_dinero = 0
+        egreso_dinero = 0
+        saldo = ingreso_dinero + egreso_dinero
 
     paginator = Paginator(ingresos_list, 20)
     page_number = request.GET.get("page")

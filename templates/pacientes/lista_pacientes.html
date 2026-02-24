@@ -53,6 +53,7 @@
                     <th>Apellido y Nombre </th>
                     <th>Edad</th>
                     <th>DNI</th>
+                    <th>Telefono</th>
                     <th>Editar Paciente</th>
                     <th>Historia Clinica</th>
                     <th>Eliminar</th>
@@ -64,6 +65,7 @@
                     <td>{{ paciente.nombre }}</td>
                     <td>{{ paciente.edad }}</td>
                     <td>{{ paciente.numerodocumento|default:"" }}</td>
+                    <td>{{ paciente.telefono|default:"" }}</td>
 
                     <td>
                         <button type="button" class="btn btn-outline-secondary btn-sm" onclick="location.href='/pacientes/editar/{{ paciente.pk }}'">
@@ -224,6 +226,7 @@ function actualizarVista(data) {
                 <td>${p.nombre}</td>
                 <td>${p.edad}</td>
                 <td>${p.dni}</td>
+                <td>${p.telefono}</td>
                 <td>
                     <button type="button" class="btn btn-outline-secondary btn-sm" onclick="location.href='/pacientes/editar/${p.id}'">
                         <i class="fas fa-pencil-alt"></i>
