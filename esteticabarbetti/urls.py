@@ -22,12 +22,13 @@ from django.shortcuts import redirect
 
 from .views import home, loginusuario, salir
 
-"""
+
 def redirect_404_to_login(request, exception):
     return redirect('login')  # o la URL que uses
 
 handler404 = 'esteticabarbetti.urls.redirect_404_to_login'
-"""
+
+
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', home, name="home"),
