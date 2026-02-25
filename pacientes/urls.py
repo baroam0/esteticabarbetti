@@ -19,6 +19,3 @@ urlpatterns = [
     path('buscarpacienteturno', views.buscar_pacientes_tratamiento, name='buscar_pacientes_tratamiento'),
     path('crearprecargar/<int:pk>', views.crear_paciente_precarga, name='crear_paciente_precarga'),
 ]
-
-
-
