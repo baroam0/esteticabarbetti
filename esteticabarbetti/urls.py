@@ -22,6 +22,7 @@ from django.shortcuts import redirect
 
 from .views import home, loginusuario, salir
 
+
 def redirect_404_to_login(request, exception):
     return redirect('login')  # o la URL que uses
 
