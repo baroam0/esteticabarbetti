@@ -42,16 +42,28 @@ def ingresos_view(request):
         ingresos_list = ingresos_list.filter(fecha__lte=fecha_hasta_dt)
 
     if turnofiltro == "M":
+        limite = time(13, 30)
+        ingresos_list = ingresos_list.filter(
+            fecha__time__gte=time(6,0), fecha__time__lt=limite
+        )
+        """
         ingresos_list = ingresos_list.filter(
             fecha__hour__gte=6,
             fecha__hour__lt=13
         )
+        """
 
     elif turnofiltro == "T":
+        limite = time(13, 30) # 13:30 
+        ingresos_list = ingresos_list.filter(
+            fecha__time__gte=limite, fecha__time__lt=time(23, 0)
+        )
+        """
         ingresos_list = ingresos_list.filter(
             fecha__hour__gte=13,
             fecha__hour__lt=23
         )
+        """
     
     if ingresos_list:
         ingreso_dinero = sum(i.monto for i in ingresos_list if i.monto > 0)
