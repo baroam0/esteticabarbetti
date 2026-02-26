@@ -1,18 +1,20 @@
 from datetime import datetime, time, timedelta
 
 from django.db.models import Count
+from django.http import JsonResponse
 from django.shortcuts import render
 from django.utils import timezone
+
 
 from cosmiatras.models import Cosmetologa
 from turnos.models import Turno, TurnoProducto
 from productos.models import Producto
 from .forms import ReporteCosmiatraForm, ReporteProductoForm
 
-
-
 def reporte_cosmiatra(request):
     form = ReporteCosmiatraForm(request.GET or None)
+
+    botonescosmiatras = Cosmetologa.objects.all().order_by("apellido")
 
     lista_turnos = []
     total = 0
@@ -65,7 +67,7 @@ def reporte_cosmiatra(request):
             })
 
         comision = total * porcentaje / 100
-
+    
     return render(
         request, 
         "reportes/reporte_cosmiatra.html", 
@@ -74,12 +76,10 @@ def reporte_cosmiatra(request):
             "turnos": lista_turnos, 
             "total": total,
             "comision": comision,
-            "porcentaje": porcentaje
+            "porcentaje": porcentaje,
+            "botonescosmiatras": botonescosmiatras
         }
     )
-
-
-
 
 
 def reporte_productos(request):
@@ -175,9 +175,58 @@ def grafico_tratamientos(request):
         "labels": labels,
         "valores": valores,
     }
-    
 
     return render(request, "reportes/grafico_tratamientos.html", contexto)
 
+
+
+def ajax_turno_cosmiatra(request):
+    cosmiatra_id = request.GET.get("cosmiatra_id")
+    cosmetologa = Cosmetologa.objects.get(pk=cosmiatra_id)
+    turno = request.GET.get("turno")
+
+    hoy = timezone.localdate()
+
+    if turno == "manana":
+        fecha_desde = timezone.make_aware(datetime.combine(hoy, time(6, 0)))
+        fecha_hasta = timezone.make_aware(datetime.combine(hoy, time(13, 0)))
+    elif turno == "tarde":
+        fecha_desde = timezone.make_aware(datetime.combine(hoy, time(13, 0)))
+        fecha_hasta = timezone.make_aware(datetime.combine(hoy, time(22, 0)))
+    else:
+        fecha_desde = timezone.make_aware(datetime.combine(hoy, time.min))
+        fecha_hasta = timezone.make_aware(datetime.combine(hoy, time.max))
+    
+    turnos = Turno.objects.filter(
+        cosmetologa=cosmetologa,
+        fecha_hora__range=(fecha_desde, fecha_hasta),
+        pagado=True
+    ).order_by("-fecha_hora")
+
+    total = 0
+    comision = 0
+
+    if turnos:
+        for turno in turnos:
+            total = total + turno.monto
+    
+    comision = total * 20 / 100
+
+    data = []
+    for t in turnos:
+        data.append({
+            "fecha": timezone.localtime(t.fecha_hora).strftime("%d/%m/%Y %H:%M"),        
+            "paciente": t.nombrepaciente.upper() if t.nombrepaciente else "-",
+            "tratamientos": " - ".join([tr.descripcion for tr in t.tratamientos.all()]),
+            "productos": " - ".join([p.descripcion for p in t.productos.all()]),
+            "monto": str(t.monto),
+            "modo_pago": t.get_modo_pago_display(),
+            "observaciones": t.observaciones or "-",
+            "comision": comision,
+        })
+
+    total = sum(t.monto for t in turnos if t.monto)
+
+    return JsonResponse({"turnos": data, "total": str(total), "comision": str(comision)})
 
 # Create your views here.

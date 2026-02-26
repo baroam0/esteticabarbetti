@@ -41,9 +41,108 @@
         <button type="submit" class="btn btn-primary btn-block">
           Generar Reporte
         </button>
-      </form>
-    </div>
 
+
+
+
+
+
+
+
+
+
+
+
+        <!-- Botones cosmiatras -->
+{% for botoncosmiatra in botonescosmiatras %}
+    <button type="button" class="btn btn-outline-primary btn-block mt-2"
+        onclick="abrirModal('{{ botoncosmiatra.id }}', '{{ botoncosmiatra.nombre }} {{ botoncosmiatra.apellido }}')">
+        Hoy - {{ botoncosmiatra.nombre }} {{ botoncosmiatra.apellido }} (20%) 
+    </button>
+{% endfor %}
+
+<!-- Modal -->
+<div class="modal fade" id="modalCosmiatra" tabindex="-1" role="dialog">
+    <div class="modal-dialog modal-xl" role="document">
+        <div class="modal-content">
+
+            <div class="modal-header">
+                <h5 class="modal-title font-weight-bold text-primary">
+                    <i class="fas fa-user mr-2"></i>
+                    <span id="modalNombreCosmiatra"></span>
+                </h5>
+                <button type="button" class="close" data-dismiss="modal">
+                    <span>&times;</span>
+                </button>
+            </div>
+
+            <div class="modal-body">
+
+                <!-- Spinner mientras carga -->
+                <div id="modalSpinner" class="text-center py-4">
+                    <div class="spinner-border text-primary" role="status">
+                        <span class="sr-only">Cargando...</span>
+                    </div>
+                </div>
+
+                <!-- Tabla (oculta hasta que carguen los datos) -->
+                <div id="modalTablaContainer" style="display:none;">
+                    <div class="table-responsive" style="max-height: 450px; overflow-y: auto;">
+                        <table class="table table-hover table-sm">
+                            <thead class="thead-dark">
+                                <tr>
+                                    <th>Fecha</th>
+                                    <th>Paciente</th>
+                                    <th>Tratamientos</th>
+                                    <th>Productos</th>
+                                    <th>Monto</th>
+                                    <th>Modo Pago</th>
+                                    <th>Observaciones</th>
+                                </tr>
+                            </thead>
+                            <tbody id="modalTablaCuerpo"></tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Sin resultados -->
+                <div id="modalSinDatos" class="text-center text-muted py-4" style="display:none;">
+                    <i class="fas fa-inbox fa-2x mb-2"></i>
+                    <p>No hay turnos registrados</p>
+                </div>
+
+            </div>
+
+            <div class="modal-footer d-flex justify-content-between align-items-center">
+                <span class="font-weight-bold text-info">
+                    Total: <span id="modalTotal">0</span>
+                </span>
+
+                <span class="font-weight-bold text-info">
+                    Comision (20%): <span id="modalComision">0</span>
+                </span>
+                <button type="button" class="btn btn-secondary btn-sm" data-dismiss="modal">Cerrar</button>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+      </form>
+      
+    </div>
 
     <!-- Tabla responsiva -->
     <div class="table-responsive">
@@ -84,5 +183,55 @@
 {% endblock %}
 {% block js %}
 <script>
+
+    function abrirModal(cosmiatraId, nombre) {
+      const turno = document.getElementById("id_turno").value;
+
+      document.getElementById("modalNombreCosmiatra").textContent = nombre;
+      document.getElementById("modalSpinner").style.display = "block";
+      document.getElementById("modalTablaContainer").style.display = "none";
+      document.getElementById("modalSinDatos").style.display = "none";
+      document.getElementById("modalTablaCuerpo").innerHTML = "";
+      document.getElementById("modalTotal").textContent = "0";
+
+      $("#modalCosmiatra").modal("show");
+
+      fetch(`/reportes/cosmiatra-ajax/?cosmiatra_id=${cosmiatraId}&turno=${turno}`)
+          .then(response => response.json())
+          .then(data => {
+              console.log(data);
+              document.getElementById("modalSpinner").style.display = "none";
+
+              if (data.turnos.length === 0) {
+                  document.getElementById("modalSinDatos").style.display = "block";
+                  return;
+              }
+
+              const tbody = document.getElementById("modalTablaCuerpo");
+              data.turnos.forEach(t => {
+                  tbody.innerHTML += `
+                      <tr>
+                          <td>${t.fecha}</td>
+                          <td>${t.paciente}</td>
+                          <td>${t.tratamientos}</td>
+                          <td>${t.productos}</td>
+                          <td class="text-success font-weight-bold">$${t.monto}</td>
+                          <td>${t.modo_pago}</td>
+                          <td>${t.observaciones}</td>
+                      </tr>
+                  `;
+              });
+
+              document.getElementById("modalTotal").textContent = `$${data.total}`;
+              document.getElementById("modalComision").textContent = `$${data.comision}`;
+              document.getElementById("modalTablaContainer").style.display = "block";
+          })
+          .catch(() => {
+              document.getElementById("modalSpinner").style.display = "none";
+              document.getElementById("modalSinDatos").style.display = "block";
+          });
+  }
+
+
 </script>
 {% endblock %}
