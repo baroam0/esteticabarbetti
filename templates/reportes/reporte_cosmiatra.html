@@ -10,7 +10,7 @@
   
     <div class="card-body">
 
-      <form action="/reportes/cosmiatras" method="GET">
+      <form action="/reportes/cosmiatras/" method="GET">
         {% csrf_token %}
     
         <div class="form-group">
@@ -42,41 +42,30 @@
           Generar Reporte
         </button>
 
-
-
-
-
-
-
-
-
-
-
-
         <!-- Botones cosmiatras -->
-{% for botoncosmiatra in botonescosmiatras %}
-    <button type="button" class="btn btn-outline-primary btn-block mt-2"
-        onclick="abrirModal('{{ botoncosmiatra.id }}', '{{ botoncosmiatra.nombre }} {{ botoncosmiatra.apellido }}')">
-        Hoy - {{ botoncosmiatra.nombre }} {{ botoncosmiatra.apellido }} (20%) 
-    </button>
-{% endfor %}
+        {% for botoncosmiatra in botonescosmiatras %}
+        <button type="button" class="btn btn-outline-primary btn-block mt-2"
+          onclick="abrirModal('{{ botoncosmiatra.id }}', '{{ botoncosmiatra.nombre }} {{ botoncosmiatra.apellido }}')">
+          Hoy - {{ botoncosmiatra.nombre }} {{ botoncosmiatra.apellido }} (20%) 
+        </button>
+        {% endfor %}
 
-<!-- Modal -->
-<div class="modal fade" id="modalCosmiatra" tabindex="-1" role="dialog">
-    <div class="modal-dialog modal-xl" role="document">
-        <div class="modal-content">
+        <!-- Modal -->
+        <div class="modal fade" id="modalCosmiatra" tabindex="-1" role="dialog">
+        <div class="modal-dialog modal-xl" role="document">
+          <div class="modal-content">
 
-            <div class="modal-header">
-                <h5 class="modal-title font-weight-bold text-primary">
-                    <i class="fas fa-user mr-2"></i>
-                    <span id="modalNombreCosmiatra"></span>
-                </h5>
-                <button type="button" class="close" data-dismiss="modal">
-                    <span>&times;</span>
-                </button>
-            </div>
+              <div class="modal-header">
+                  <h5 class="modal-title font-weight-bold text-primary">
+                      <i class="fas fa-user mr-2"></i>
+                      <span id="modalNombreCosmiatra"></span>
+                  </h5>
+                  <button type="button" class="close" data-dismiss="modal">
+                      <span>&times;</span>
+                  </button>
+              </div>
 
-            <div class="modal-body">
+              <div class="modal-body">
 
                 <!-- Spinner mientras carga -->
                 <div id="modalSpinner" class="text-center py-4">
@@ -110,10 +99,9 @@
                     <i class="fas fa-inbox fa-2x mb-2"></i>
                     <p>No hay turnos registrados</p>
                 </div>
+              </div>
 
-            </div>
-
-            <div class="modal-footer d-flex justify-content-between align-items-center">
+              <div class="modal-footer d-flex justify-content-between align-items-center">
                 <span class="font-weight-bold text-info">
                     Total: <span id="modalTotal">0</span>
                 </span>
@@ -122,26 +110,11 @@
                     Comision (20%): <span id="modalComision">0</span>
                 </span>
                 <button type="button" class="btn btn-secondary btn-sm" data-dismiss="modal">Cerrar</button>
+              </div>
             </div>
-
+          </div>
         </div>
-    </div>
-</div>
-
-
-
-
-
-
-
-
-
-
-
-
-
-      </form>
-      
+      </form>      
     </div>
 
     <!-- Tabla responsiva -->
