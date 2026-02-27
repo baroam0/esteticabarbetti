@@ -1,8 +1,10 @@
 
+from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import get_object_or_404, render, redirect
 from django.http import JsonResponse
 from django.urls import reverse
+
 
 from pacientes.models import Paciente
 from .forms import HistoriaClinicaForm, ImagenMultipleForm
@@ -116,6 +118,8 @@ def editar_historiaclinica(request, pk):
             historia = form.save(commit=False)
             historia.responsable = request.user
             historia.save()
+
+            messages.success(request, "Historia Clinica actualizada.") 
 
             # Obtener archivos enviados
             imagenes = request.FILES.getlist('imagenes[]')

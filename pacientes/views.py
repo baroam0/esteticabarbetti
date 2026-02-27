@@ -1,10 +1,12 @@
 
 import json
 
+
 from django.core.paginator import Paginator
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.urls import reverse
+from django.utils import timezone
 from django.http import JsonResponse
 from django.shortcuts import render, redirect, get_object_or_404
 
@@ -121,6 +123,7 @@ def buscar_pacientes_tratamiento(request):
         })
 
 
+@login_required
 def crear_paciente(request):
     if request.method == 'POST':
         form = PacienteForm(request.POST, request.FILES)
@@ -135,6 +138,7 @@ def crear_paciente(request):
         'form': form, 'accion': 'Nuevo '})
 
 
+@login_required
 def editar_paciente(request, pk):
     paciente = get_object_or_404(Paciente, pk=pk)
 
@@ -159,6 +163,7 @@ def editar_paciente(request, pk):
     return render(request, 'pacientes/crear_paciente.html', context)
 
 
+@login_required
 def eliminar_paciente(request, pk):
     paciente = Paciente.objects.get(pk=pk)
     historiaclinica = HistoriaClinica.objects.filter(paciente=paciente)
@@ -182,10 +187,12 @@ def eliminar_paciente(request, pk):
     )
 
 
+@login_required
 def unificar_paciente(request):
     return render(request, 'pacientes/unificar_paciente.html')
 
 
+@login_required
 def unificar_buscar_pacientes(request):
     parametro = request.GET.get('q', '')
     page_number = request.GET.get('page', 1)
@@ -211,7 +218,8 @@ def unificar_buscar_pacientes(request):
         "edad": p.edad(),
         "sexo": p.sexo,
         "dni": p.numerodocumento or "",
-        "fechanacimiento": p.fechanacimiento or ""
+        "fechanacimiento": p.fechanacimiento or "",
+        "telefono": p.telefono or "",
     } for p in page_obj]
 
     return JsonResponse({
@@ -225,6 +233,7 @@ def unificar_buscar_pacientes(request):
     })
 
 
+@login_required
 def unificar_proceso_paciente(request):
     if request.method == "POST":
         data = json.loads(request.body)
@@ -242,6 +251,7 @@ def unificar_proceso_paciente(request):
     return JsonResponse({"error": "Método no permitido"}, status=405)
 
 
+@login_required
 def crear_paciente_precarga(request, pk):
     if request.method == 'POST':
         form = PacienteForm(request.POST, request.FILES)
@@ -267,5 +277,25 @@ def crear_paciente_precarga(request, pk):
             'accion': 'Nuevo '
         }
     )
+
+
+@login_required
+def ajax_historia_clinica(request):
+    paciente = request.GET.get("paciente_id")
+
+    historiasclinicas = HistoriaClinica.objects.filter(paciente=paciente)
+    data = list()
+    
+    for historiaclinica in historiasclinicas:
+        data.append({
+            "fecha": timezone.localtime(historiaclinica.fecha).strftime("%d/%m/%Y %H:%M"),        
+            "paciente": historiaclinica.paciente.nombre,
+            "historia": historiaclinica.historia,
+            "tratamiento": historiaclinica.tratamiento or "",
+            "diagnostico": historiaclinica.diagnostico or "",
+        })
+    
+    return JsonResponse({"data": data})
+
 
 # Create your views here.

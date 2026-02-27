@@ -37,6 +37,8 @@
                                     <th>Sexo</th>
                                     <th>Fecha Nacimiento</th>
                                     <th>Edad</th>
+                                    <th>Telefono</th>
+                                    <th>HC</th>
                                 </tr>
                             </thead>
                             <tbody id="tbodyPacienteBase">
@@ -68,6 +70,8 @@
                                     <th>Sexo</th>
                                     <th>Fecha Nacimiento</th>
                                     <th>Edad</th>
+                                    <th>Telefono</th>
+                                    <th>HC</th>
                                 </tr>
                             </thead>
                             <tbody id="tbodyPacienteAsimilar">
@@ -81,12 +85,70 @@
     </div>
 
     
-        <div class="text-center mt-6">
-            <button id="btnUnificar" class="btn btn-danger btn-lg">
-                UNIFICAR
-            </button>
+    <div class="text-center mt-6">
+        <button id="btnUnificar" class="btn btn-danger btn-lg">
+            UNIFICAR
+        </button>
+    </div>
+
+
+    <div class="modal fade" id="modalHistoriaClinica" tabindex="-1" role="dialog">
+        <div class="modal-dialog modal-xl" role="document">
+          <div class="modal-content">
+
+              <div class="modal-header">
+                  <h5 class="modal-title font-weight-bold text-primary">
+                      <i class="fas fa-user mr-2"></i>
+                      <span id="modalNombrePaciente"></span>
+                  </h5>
+                  <button type="button" class="close" data-dismiss="modal">
+                      <span>&times;</span>
+                  </button>
+              </div>
+
+              <div class="modal-body">
+
+                <!-- Spinner mientras carga -->
+                <div id="modalSpinner" class="text-center py-4">
+                    <div class="spinner-border text-primary" role="status">
+                        <span class="sr-only">Cargando...</span>
+                    </div>
+                </div>
+
+                <!-- Tabla (oculta hasta que carguen los datos) -->
+                <div id="modalTablaContainer" style="display:none;">
+                    <div class="table-responsive" style="max-height: 450px; overflow-y: auto;">
+                        <table class="table table-hover table-sm">
+                            <thead class="thead-dark">
+                                <tr>
+                                    <th>Fecha</th>
+                                    <th>Historia</th>
+                                    <th>Diagnostico</th>
+                                    <th>Tratamiento</th>
+                                </tr>
+                            </thead>
+                            <tbody id="modalTablaCuerpo"></tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Sin resultados -->
+                <div id="modalSinDatos" class="text-center text-muted py-4" style="display:none;">
+                    <i class="fas fa-inbox fa-2x mb-2"></i>
+                    <p>No hay Historia Clinica Registrada</p>
+                </div>
+              </div>
+
+              <div class="modal-footer d-flex justify-content-between align-items-center">
+                <!--span class="font-weight-bold text-info">
+                    Total: <span id="modalTotal">0</span>
+                </span-->
+
+                <button type="button" class="btn btn-secondary btn-sm" data-dismiss="modal">Cerrar</button>
+              </div>
+            </div>
+          </div>
         </div>
-    
 
 </div>
 {% endblock %}
@@ -94,12 +156,11 @@
 {% block js %}
 <script>
 
+    document.getElementById("btnUnificar").addEventListener("click", function () {
+        let base = document.querySelector("input[name='paciente_base']:checked");
+        let asimilar = document.querySelector("input[name='paciente_asimilar']:checked");
 
-document.getElementById("btnUnificar").addEventListener("click", function () {
-    let base = document.querySelector("input[name='paciente_base']:checked");
-    let asimilar = document.querySelector("input[name='paciente_asimilar']:checked");
-
-    if (!base) {
+        if (!base) {
         alert("Debe seleccionar un paciente BASE en la tabla superior.");
         return;
     }
@@ -191,6 +252,13 @@ document.addEventListener("change", function (e) {
                         <td>${celdas[3].innerText}</td>
                         <td>${celdas[4].innerText}</td>
                         <td>${celdas[5].innerText}</td>
+                        <td>${celdas[6].innerText}</td>
+                        <td>
+                            <button type="button" class="btn btn-outline-success btn-sm" onclick="abrirModal(${radioSup.id})">
+                                <i class="fas fa-comment-medical"></i>
+                            </button>
+                        </td>
+
                     </tr>
                 `;
             }
@@ -233,36 +301,15 @@ function actualizarVista(data) {
                 <td>${p.sexo}</td>
                 <td>${p.fechanacimiento}</td>
                 <td>${p.edad}</td>
+                <td>${p.telefono}</td>
+                <td>
+                    <button type="button" class="btn btn-outline-success btn-sm" onclick='abrirModal(${p.id})' ">
+                        <i class="fas fa-comment-medical"></i>
+                    </button>
+                </td>
             </tr>
         `;
     });
-
-    let pag = document.getElementById("paginacion");
-    pag.innerHTML = "";
-
-    if (data.has_previous) {
-        pag.innerHTML += `
-            <li class="page-item">
-                <a class="page-link" href="#" onclick="buscarPagina(${data.prev_page})">
-                    <i class="fas fa-angle-left"></i>
-                </a>
-            </li>`;
-    }
-
-    pag.innerHTML += `
-        <li class="page-item disabled">
-            <a class="page-link">Pag. ${data.page} de ${data.total_pages}</a>
-        </li>
-    `;
-
-    if (data.has_next) {
-        pag.innerHTML += `
-            <li class="page-item">
-                <a class="page-link" href="#" onclick="buscarPagina(${data.next_page})">
-                    <i class="fas fa-angle-right"></i>
-                </a>
-            </li>`;
-    }
 }
 
 
@@ -279,37 +326,59 @@ function actualizarVistaAsimilar(data) {
                 <td>${p.sexo}</td>
                 <td>${p.fechanacimiento}</td>
                 <td>${p.edad}</td>
+                <td>${p.telefono}</td>
+                <td>
+                    <button type="button" class="btn btn-outline-success btn-sm" onclick='abrirModal(${p.id})' ">
+                        <i class="fas fa-comment-medical"></i>
+                    </button>
+                </td>
             </tr>
         `;
     });
 
-    let pag = document.getElementById("paginacion");
-    pag.innerHTML = "";
-
-    if (data.has_previous) {
-        pag.innerHTML += `
-            <li class="page-item">
-                <a class="page-link" href="#" onclick="buscarPagina(${data.prev_page})">
-                    <i class="fas fa-angle-left"></i>
-                </a>
-            </li>`;
-    }
-
-    pag.innerHTML += `
-        <li class="page-item disabled">
-            <a class="page-link">Pag. ${data.page} de ${data.total_pages}</a>
-        </li>
-    `;
-
-    if (data.has_next) {
-        pag.innerHTML += `
-            <li class="page-item">
-                <a class="page-link" href="#" onclick="buscarPagina(${data.next_page})">
-                    <i class="fas fa-angle-right"></i>
-                </a>
-            </li>`;
-    }
 }
+
+
+function abrirModal(pacienteId) {
+
+      $("#modalHistoriaClinica").modal("show");
+
+      fetch(`/pacientes/historiaclinica-ajax/?paciente_id=${pacienteId}`)
+          .then(response => response.json())
+          .then(data => {
+              document.getElementById("modalSpinner").style.display = "none";
+
+              if (data.data.length === 0) {
+                  document.getElementById("modalSinDatos").style.display = "block";
+                  return;
+              }
+
+              const tbody = document.getElementById("modalTablaCuerpo");
+              data.data.forEach(hc => {
+
+                  var paciente = hc.paciente;
+
+                  document.getElementById("modalNombrePaciente").textContent = paciente;
+                  tbody.innerHTML += `
+                      <tr>
+                          <td>${hc.fecha}</td>
+                          <td>${hc.historia}</td>
+                          <td>${hc.diagnostico}</td>
+                          <td>${hc.tratamiento}</td>
+                      </tr>
+                  `;
+              });
+
+              //document.getElementById("modalTotal").textContent = `$${data.total}`;
+              //document.getElementById("modalComision").textContent = `$${data.comision}`;
+              document.getElementById("modalTablaContainer").style.display = "block";
+          })
+          .catch(() => {
+              document.getElementById("modalSpinner").style.display = "none";
+              document.getElementById("modalSinDatos").style.display = "block";
+          });
+  }
 
 </script>
 {% endblock %}
+
