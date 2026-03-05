@@ -210,6 +210,30 @@ def ingresos_view3(request):
         fecha__range=(inicio_hoy, fin_hoy)
     ).order_by("-fecha")
 
+    tmpingresoshoylist = list()
+    tmpingresoshoydict = dict()
+
+    for i in ingresoshoy:
+        if i.monto > 0:
+            tmpingresoshoydict = {
+                "fecha": i.fecha,
+                "descripcion": i.descripcion,
+                "monto": i.monto,
+                "esingreso": True,
+            }
+            tmpingresoshoylist.append(tmpingresoshoydict)
+            tmpingresoshoydict = dict()
+        else:
+            tmpingresoshoydict = {
+                "fecha": i.fecha,
+                "descripcion": i.descripcion,
+                "monto": i.monto,
+                "esingreso": False,
+            }
+            tmpingresoshoylist.append(tmpingresoshoydict)
+            tmpingresoshoydict = dict()
+    print(tmpingresoshoylist)
+
     if ingresoshoy:
         ingreso_dinero_hoy = sum(i.monto for i in ingresoshoy if i.monto > 0)
         egreso_dinero_hoy = sum(i.monto for i in ingresoshoy if i.monto < 0)
@@ -286,6 +310,7 @@ def ingresos_view3(request):
         "ingreso_dinero": ingreso_dinero,
         "egreso_dinero": egreso_dinero,
         "ingresoshoy": ingresoshoy,
+        "tmpingresoshoylist": tmpingresoshoylist,
         "fecha_desde": fecha_desde,
         "fecha_hasta": fecha_hasta,
         "turno": turnofiltro,
