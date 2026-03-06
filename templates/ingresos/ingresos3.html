@@ -179,21 +179,34 @@
                         <tr>
                             <th>Fecha</th>
                             <th>Descripción</th>
-                            <!--th>Turno</th-->
-                            <th>Monto</th>
+                            <th>Ingreso</th>
+                            <th>Egreso</th>
                             <th>Editar</th>
                         </tr>
                     </thead>
 
                     <tbody>
-                        {% for ingreso in ingresos %}
+                        {% for ingreso in tmpingresoshoylist %}
                         <tr>
                             <td>{{ ingreso.fecha|date:"d/m/Y h:i a" }}</td>
                             <td>{{ ingreso.descripcion }}</td>
                             <!--td>{{ ingreso.get_turno_display }}</td-->
-                            <td>{{ ingreso.monto|floatformat:2 }}</td>
-                            <td>
 
+                            {% if ingreso.esingreso %}
+                                    <td class="text-success">
+                                         {{ ingreso.monto|floatformat:2 }}
+                                    </td>
+                                    <td>
+                                    </td>
+                                {% else %}
+                                    <td>
+                                    </td>
+                                    <td class="text-danger">
+                                         {{ ingreso.monto|floatformat:2 }}
+                                    </td>
+                            {% endif %}
+                            
+                            <td>
                                 <button class="btn btn-outline-secondary btn-sm"
                                     onclick="editarIngreso(
                                         '{{ ingreso.id }}',

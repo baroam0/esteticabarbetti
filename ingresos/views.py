@@ -216,6 +216,7 @@ def ingresos_view3(request):
     for i in ingresoshoy:
         if i.monto > 0:
             tmpingresoshoydict = {
+                "id": i.id,
                 "fecha": i.fecha,
                 "descripcion": i.descripcion,
                 "monto": i.monto,
@@ -225,7 +226,7 @@ def ingresos_view3(request):
             tmpingresoshoydict = dict()
         else:
             tmpingresoshoydict = {
-                "fecha": i.fecha,
+                "id": i.id,
                 "descripcion": i.descripcion,
                 "monto": i.monto,
                 "esingreso": False,
