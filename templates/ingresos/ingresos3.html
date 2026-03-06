@@ -210,7 +210,7 @@
                                 <button class="btn btn-outline-secondary btn-sm"
                                     onclick="editarIngreso(
                                         '{{ ingreso.id }}',
-                                        '{{ ingreso.fecha|date:"Y-m-d" }}',
+                                        '{{ ingreso.fecha|date:"Y-m-d\TH:i" }}',
                                         '{{ ingreso.descripcion|escapejs }}',
                                         '{{ ingreso.monto|floatformat:2 }}',
                                         '{{ ingreso.turno }}',
@@ -262,9 +262,6 @@
     </div>
 </div>
 
-
-
-
 {%endblock%}
 
 {% block js%}
@@ -298,7 +295,6 @@
         document.getElementById("monto").value = monto;
         document.getElementById("turno").value = turno;
     }
-
 </script>
 
 {%endblock%}
