@@ -232,7 +232,8 @@ def ingresos_view3(request):
             }
             tmpingresoshoylist.append(tmpingresoshoydict)
             tmpingresoshoydict = dict()
-    print(tmpingresoshoylist)
+    
+    tmpingresoshoylist = sorted(tmpingresoshoylist, key=lambda x: x["esingreso"], reverse=True)
 
     if ingresoshoy:
         ingreso_dinero_hoy = sum(i.monto for i in ingresoshoy if i.monto > 0)
@@ -257,7 +258,7 @@ def ingresos_view3(request):
         ingreso.monto = request.POST.get("monto")
         ingreso.usuario = request.user
         ingreso.save()
-        return redirect("ingresos")
+        return redirect("ingresos3")
 
     fecha_desde = request.GET.get("fecha_desde", "")
     fecha_hasta = request.GET.get("fecha_hasta", "")
