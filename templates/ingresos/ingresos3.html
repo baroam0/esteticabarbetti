@@ -9,7 +9,7 @@
             <h6 class="m-0 font-weight-bold text-primary">Registrar / Editar Ingreso</h6>
         </div>
 
-        <div class="card-body">
+        <div class="card-body" id="datosingresos">
             <form method="POST">
                 {% csrf_token %}
 
@@ -230,7 +230,6 @@
                     </tbody>
                 </table>
 
-
                 <nav aria-label="Page navigation">
                     <ul class="pagination pagination-sm justify-content-center" id="paginacion">
                         {% if ingresos.has_previous %}
@@ -261,13 +260,10 @@
         </div>
     </div>
 </div>
-
 {%endblock%}
 
 {% block js%}
-
 <script>
-
     document.addEventListener('DOMContentLoaded', function () {
         const now = new Date();
         const offset = now.getTimezoneOffset() * 60000;
@@ -293,8 +289,9 @@
         document.getElementById("fecha").value = fecha;
         document.getElementById("descripcion").value = descripcion;
         document.getElementById("monto").value = monto;
-        document.getElementById("turno").value = turno;
+        //document.getElementById("turno").value = turno;
+
+        document.getElementById("datosingresos").scrollIntoView({ behavior: "smooth", block: "start" });
     }
 </script>
-
 {%endblock%}
