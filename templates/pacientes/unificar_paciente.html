@@ -341,7 +341,13 @@ function actualizarVistaAsimilar(data) {
 
 function abrirModal(pacienteId) {
 
-      $("#modalHistoriaClinica").modal("show");
+    document.getElementById("modalTablaCuerpo").innerHTML = "";
+    document.getElementById("modalNombrePaciente").textContent = "";
+    document.getElementById("modalSinDatos").style.display = "none";
+    document.getElementById("modalTablaContainer").style.display = "none";
+    document.getElementById("modalSpinner").style.display = "block";
+
+    $("#modalHistoriaClinica").modal("show");
 
       fetch(`/pacientes/historiaclinica-ajax/?paciente_id=${pacienteId}`)
           .then(response => response.json())
@@ -369,8 +375,6 @@ function abrirModal(pacienteId) {
                   `;
               });
 
-              //document.getElementById("modalTotal").textContent = `$${data.total}`;
-              //document.getElementById("modalComision").textContent = `$${data.comision}`;
               document.getElementById("modalTablaContainer").style.display = "block";
           })
           .catch(() => {
