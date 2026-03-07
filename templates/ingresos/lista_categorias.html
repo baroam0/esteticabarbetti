@@ -1,0 +1,68 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container-fluid">
+
+    <!-- Encabezado -->
+    <div class="text-center mb-4">
+        <h3 class="h3 text-gray-800">Listado de Categorias de Ingresos</h3>
+    </div>
+
+    <!-- Mensajes -->
+    {% if messages %}
+        {% for message in messages %}
+            <div class="alert alert-{{message.tags}} alert-dismissible fade show" role="alert">
+                {{message}}
+                <button type="button" class="close" data-dismiss="alert" aria-label="Cerrar">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+        {% endfor %}
+    {% endif %}
+
+    <!-- Buscador -->
+    <form action="/ingresos/listarcategorias/" method="GET" class="mb-3">
+        <div class="input-group">
+            <input class="form-control" id="txtBuscar" name="txtBuscar" placeholder="Descripcion">
+            <div class="input-group-append">
+                <button type="button" class="btn btn-primary" title="Nuevo Producto" onclick="location.href='/ingresos/crearcategoria/'">
+                    <i class="fas fa-plus"></i>
+                </button>
+            </div>
+        </div>
+    </form>
+
+    <!-- Tabla responsiva -->
+    <div class="table-responsive">
+        <table class="table table-hover table-sm" id="tablaPacientes">
+            <thead class="thead-light">
+                <tr>
+                    <th>Descripcion </th>
+                    <th>Editar</th>
+                </tr>
+            </thead>
+            <tbody id="tbodyPacientes">
+                {% for categoria in results %}
+                <tr>
+                    <td>{{ categoria.descripcion }}</td>
+                    <td>
+                        <button type="button" class="btn btn-outline-secondary btn-sm" onclick="location.href='/ingresos/editarcategoria/{{ categoria.pk }}'">
+                            <i class="fas fa-pencil-alt"></i>
+                        </button>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Paginación -->
+    
+</div>
+{% endblock %}
+
+{% block js %}
+<script>
+
+</script>
+{% endblock %}

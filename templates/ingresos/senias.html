@@ -2,14 +2,29 @@
 
 {% block content %}
 
+
+<style>
+#scrollTableContainer {
+    overflow: hidden;
+    max-height: 0;
+    opacity: 0;
+    transition: max-height 0.8s ease, opacity 0.6s ease;
+}
+
+#scrollTableContainer.visible {
+    max-height: 1000px; /* un valor mayor al alto real de la tabla */
+    opacity: 1;
+}
+</style>
+
 <div class="container mt-4">
     <!-- Card Formulario -->
     <div class="card shadow mb-4">
         <div class="card-header py-3">
-            <h6 class="m-0 font-weight-bold text-primary">Registrar / Editar Ingreso</h6>
+            <h6 class="m-0 font-weight-bold text-primary">Registrar / Editar Señas</h6>
         </div>
 
-        <div class="card-body" id="datosingresos">
+        <div class="card-body">
             <form method="POST">
                 {% csrf_token %}
 
@@ -30,109 +45,74 @@
                     <input type="number" step="0.01" class="form-control" id="monto" name="monto" placeholder="Monto...." required>
                 </div>
 
+                <div class="form-group">
+                    <label>Categoria</label>
+                    <select class="form-control" id="categoria" name="categoria">
+                        {% for c in categorias%}
+                        <option value={{c.pk}}>{{c.descripcion}} </option>
+                        {% endfor %}
+                        
+                    </select>
+                </div-->
+
                 <div class="text-right mt-3">
-                    <button type="reset" class="btn btn-secondary mr-2">Nuevo</button>
+                    <button type="reset" class="btn btn-secondary mr-2" onclick="ponerFecha()" >Nuevo</button>
                     <button type="submit" class="btn btn-primary">Guardar</button>
                 </div>
 
             </form>
         </div>
-    </div>
 
-
-    <div class="card-header py-3 d-flex justify-content-between align-items-center">
-        <h6 class="m-0 font-weight-bold text-primary"></h6>
-        <button class="btn btn-info btn-sm" data-toggle="modal" data-target="#modalIngresosHoy">
-            <i class="fas fa-calendar-day mr-1"></i> Ingresos de hoy
-        </button>
-    </div>
-
-<div class="modal fade" id="modalIngresosHoy" tabindex="-1" role="dialog">
-    <div class="modal-dialog modal-lg" role="document">
-        <div class="modal-content">
-
-            <div class="modal-header">
-                <h5 class="modal-title font-weight-bold text-primary">
-                    <i class="fas fa-calendar-day mr-2"></i> Ingresos de Hoy
-                </h5>
-                <button type="button" class="close" data-dismiss="modal">
-                    <span>&times;</span>
+        <!-- Botón para mostrar/ocultar tabla con scroll -->
+            <div class="text-center mb-4">
+                <button class="btn btn-info btn-sm" type="button" onclick="toggleScrollTable()">
+                    Mostrar / Ocultar Ingresos de hoy
                 </button>
             </div>
 
-            <div class="modal-body">
-                <div class="table-responsive" style="max-height: 400px; overflow-y: auto;">
-                    <table class="table table-hover table-sm">
-                        <thead class="thead-dark">
-                            <tr>
-                                <th>Fecha</th>
-                                <th>Descripción</th>
-                                <th>Ingreso</th>
-                                <th>Egreso</th>
-                            </tr>
-                        </thead>
-                        <tbody>
+            <!-- Contenedor oculto -->
+            <div id="scrollTableContainer">
+                <div class="card shadow mb-4">
+                    <div class="card-header py-3">
+                        <h6 class="m-0 font-weight-bold text-primary">Ingresos de hoy</h6>
+                    </div>
 
-                            {% for ingresohoy in tmpingresoshoylist %}
-                            <tr>
-                                <td>{{ ingresohoy.fecha|date:"d/m/Y h:i a" }} </td>
-                                <td>{{ ingresohoy.descripcion }}</td>
+                    <div class="card-body" style="max-height: 300px; overflow-y: auto;">
+                        <table class="table table-hover table-sm">
+                            <thead class="thead-dark">
+                                <tr>
+                                    <th>Fecha</th>
+                                    <th>Descripción</th>
+                                    <th>Monto</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for ingresohoy in ingresoshoy %}
+                                <tr>
+                                    <td>{{ ingresohoy.fecha|date:"d/m/Y h:i a" }}</td>
+                                    <td>{{ ingresohoy.descripcion }}</td>
+                                    <td>{{ ingresohoy.monto|floatformat:2 }}</td>
+                                </tr>
+                                {% endfor %}
 
-                                {% if ingresohoy.esingreso %}
-                                    <td class="text-success">
-                                         {{ ingresohoy.monto|floatformat:2 }}
-                                    </td>
-                                    <td>
-                                    </td>
-                                {% else %}
-                                    <td>
-                                    </td>
-                                    <td class="text-danger">
-                                         {{ ingresohoy.monto|floatformat:2 }}
-                                    </td>
-                                {% endif %}
-                            </tr>
-                            {% empty %}
-                            <tr>
-                                <td colspan="3" class="text-center text-muted">No hay ingresos registrados hoy</td>
-                            </tr>
-                            {% endfor %}
-                            <tr>
-                                <td></td>
-                                <td></td>
-                                <td><span class="text-success mr-3">Ingresos: {{ ingreso_dinero_hoy }}</span></td>
-                                <td><span class="text-danger mr-3">Egresos: {{ egreso_dinero_hoy }}</span></td>
-                                
-                            </tr>
-                        </tbody>
-                    </table>
+                                <tr>
+                                    <td class="text-success"> <i class="fas fa-arrow-up mr-1"></i> Ingresos: {{ ingreso_dinero_hoy }}</td>
+                                    <td class="text-danger"> <i class="fas fa-arrow-down mr-1"></i>Egresos: {{ egreso_dinero_hoy }}</td>
+                                    <td class="text-info"><i class="fas fa-balance-scale mr-1"></i> Saldo: {{ saldo_hoy }}</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
             </div>
-
-            <div class="modal-footer d-flex justify-content-between align-items-center">
-                <div class="font-weight-bold small">
-                    <!--span class="text-success mr-3"><i class="fas fa-arrow-up mr-1"></i>Ingresos: {{ ingreso_dinero_hoy }}</span>
-                    <span class="text-danger mr-3"><i class="fas fa-arrow-down mr-1"></i>Egresos: {{ egreso_dinero_hoy }}</span-->
-                    <span class="text-info"><i class="fas fa-balance-scale mr-1"></i>Saldo: {{ saldo_hoy }}</span>
-                </div>
-                <button type="button" class="btn btn-secondary btn-sm" data-dismiss="modal">Cerrar</button>
-            </div>
-
-        </div>
     </div>
-</div>
-
-
 
 
     <div class="card shadow mb-4">
-
         <div class="card-header py-3 d-flex justify-content-between align-items-center">
-
             <h6 class="m-0 font-weight-bold text-primary">Listado de Ingresos</h6>
 
             <div class="d-flex align-items-center">
-
                 <form method="GET" id="filtroForm" class="form-inline">
 
                 <div class="form-group mr-3">
@@ -179,8 +159,8 @@
                         <tr>
                             <th>Fecha</th>
                             <th>Descripción</th>
-                            <th>Ingreso</th>
-                            <th>Egreso</th>
+                            <!--th>Turno</th-->
+                            <th>Monto</th>
                             <th>Editar</th>
                         </tr>
                     </thead>
@@ -191,32 +171,21 @@
                             <td>{{ ingreso.fecha|date:"d/m/Y h:i a" }}</td>
                             <td>{{ ingreso.descripcion }}</td>
                             <!--td>{{ ingreso.get_turno_display }}</td-->
-
-                            {% if ingreso.esingreso %}
-                                    <td class="text-success">
-                                         {{ ingreso.monto|floatformat:2 }}
-                                    </td>
-                                    <td>
-                                    </td>
-                                {% else %}
-                                    <td>
-                                    </td>
-                                    <td class="text-danger">
-                                         {{ ingreso.monto|floatformat:2 }}
-                                    </td>
-                            {% endif %}
-                            
+                            <td>{{ ingreso.monto|floatformat:2 }}</td>
                             <td>
+
                                 <button class="btn btn-outline-secondary btn-sm"
                                     onclick="editarIngreso(
                                         '{{ ingreso.id }}',
                                         '{{ ingreso.fecha|date:"Y-m-d\TH:i" }}',
                                         '{{ ingreso.descripcion|escapejs }}',
                                         '{{ ingreso.monto|floatformat:2 }}',
-                                        '{{ ingreso.turno }}'
+                                        '{{ ingreso.turno }}',
                                     )">
                                     <i class="fas fa-pencil-alt"></i>
                                 </button>
+                            
+                        </button>
 
                             </td>
                         </tr>
@@ -227,7 +196,6 @@
                         {% endfor %}
                     </tbody>
                 </table>
-
             </div>
         </div>
     </div>
@@ -235,13 +203,20 @@
 {%endblock%}
 
 {% block js%}
+
 <script>
+
     document.addEventListener('DOMContentLoaded', function () {
         const now = new Date();
         const offset = now.getTimezoneOffset() * 60000;
         const localISO = new Date(now - offset).toISOString().slice(0, 16);
         document.getElementById('fecha').value = localISO;
     });
+
+    function toggleScrollTable() {
+        const cont = document.getElementById("scrollTableContainer");
+        cont.classList.toggle("visible");
+    }
 
     document.getElementById("fecha_desde").addEventListener("change", function() {
         document.getElementById("filtroForm").submit();
@@ -261,9 +236,9 @@
         document.getElementById("fecha").value = fecha;
         document.getElementById("descripcion").value = descripcion;
         document.getElementById("monto").value = monto;
-        //document.getElementById("turno").value = turno;
-
-        document.getElementById("datosingresos").scrollIntoView({ behavior: "smooth", block: "start" });
+        document.getElementById("turno").value = turno;
     }
+
 </script>
+
 {%endblock%}

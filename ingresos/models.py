@@ -4,7 +4,21 @@ from django.contrib.auth.models import User
 from django.db import models
 
 
+class Categoria(models.Model):
+    descripcion = models.TextField(
+        max_length=500, null=False, blank=False
+    )
+    habilitado = models.BooleanField(default=False)
+    
+    class Meta:
+        verbose_name = "Categoria"
+        verbose_name_plural = "Categorias"
+
+
 class Ingreso(models.Model):
+    categoria = models.ForeignKey(
+        Categoria, on_delete=models.CASCADE, blank=True, null=True
+    )
     fecha = models.DateTimeField(blank=False, null=False)
     descripcion = models.TextField(
         max_length=500, null=False, blank=False
